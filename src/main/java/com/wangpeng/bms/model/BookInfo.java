@@ -21,6 +21,57 @@ public class BookInfo {
 
     private String bookimg;
 
+    // TODO Add more fields
+    private String narrator;
+
+    private Integer duration;
+
+    private Integer pageCount;
+
+    private String material;
+
+    private Integer fileSize;
+
+    public Integer getPageCount() {
+        return pageCount;
+    }
+
+    public void setPageCount(Integer pageCount) {
+        this.pageCount = pageCount;
+    }
+
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
+    }
+
+    public String getNarrator() {
+        return narrator;
+    }
+
+    public void setNarrator(String narrator) {
+        this.narrator = narrator;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
+
+    public Integer getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Integer fileSize) {
+        this.fileSize = fileSize;
+    }
+
     public Integer getBookid() {
         return bookid;
     }
