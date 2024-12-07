@@ -1,10 +1,9 @@
 package com.wangpeng.bms.model;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class BookFactory {
-    public Book createBook(BookInfo bookInfo) {
+    public IBook createBook(BookInfo bookInfo) {
         String material = bookInfo.getMaterial();
 
         switch (material.toLowerCase()) {
@@ -19,7 +18,7 @@ public class BookFactory {
         }
     }
 
-    public Book createBookSeries(String title, List<Book> books) {
+    public IBook createBookSeries(String title, List<IBook> books) {
         return new BookSeries(title, books);
     }
 }
