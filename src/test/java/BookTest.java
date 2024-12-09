@@ -1,5 +1,6 @@
 
 import com.wangpeng.bms.model.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,27 +8,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookTest {
+    private BookFactory bookFactory;
+    private BookInfo bookInfo;
+    private IBook paperBook;
+    private IBook eBook;
+    private IBook audioBook;
+
+    @BeforeEach
+    public void setUp() {
+        bookFactory = new BookFactory();
+        bookInfo = new BookInfo();
+        bookInfo.setMaterial("paper");
+        bookInfo.setPageCount(100);
+        paperBook = bookFactory.createBook(bookInfo);
+        bookInfo.setMaterial("digital");
+        bookInfo.setFileSize(100);
+        eBook = bookFactory.createBook(bookInfo);
+        bookInfo.setMaterial("audio");
+        bookInfo.setNarrator("narrator");
+        bookInfo.setDuration(100);
+        audioBook = bookFactory.createBook(bookInfo);
+    }
 
     @Test
     public void testPaperBook() {
-        BookFactory bookFactory = new BookFactory();
-        BookInfo bookInfo = new BookInfo();
-        bookInfo.setMaterial("paper");
-        bookInfo.setPageCount(100);
-        IBook book = bookFactory.createBook(bookInfo);
-        assertEquals("paper", book.getMaterial());
-        assertTrue(book instanceof PaperBook);
-        PaperBook paperBook = (PaperBook) book;
-        assertEquals(100, paperBook.getPageCount());
+        assertEquals("paper", paperBook.getMaterial());
+        assertTrue(paperBook instanceof PaperBook);
+        assertEquals(100, ((PaperBook)paperBook).getPageCount());
         assertEquals("paper", paperBook.getMaterial());
     }
 
     @Test
     public void testEBook() {
-        BookFactory bookFactory = new BookFactory();
-        BookInfo bookInfo = new BookInfo();
-        bookInfo.setMaterial("digital");
-        bookInfo.setFileSize(100);
         IBook book = bookFactory.createBook(bookInfo);
         assertEquals("digital", book.getMaterial());
         assertTrue(book instanceof EBook);
