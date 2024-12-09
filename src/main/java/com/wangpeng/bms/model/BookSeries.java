@@ -62,14 +62,12 @@ public class BookSeries implements IBook {
         books.remove(book);
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void printSeriesInfo() {
+    @Override
+    public void display() {
         System.out.println("Book Series: " + title);
         for (IBook book : books) {
-            System.out.println("Book: " + book.getName());
+            book.display();
+            System.out.println();
         }
     }
 }

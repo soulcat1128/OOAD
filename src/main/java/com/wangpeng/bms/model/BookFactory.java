@@ -10,11 +10,11 @@ public class BookFactory {
 
         switch (material.toLowerCase()) {
             case "paper":
-                return new PaperBook(bookInfo, bookInfo.getPageCount());
+                return new PaperBook(bookInfo);
             case "digital":
-                return new EBook(bookInfo, bookInfo.getFileSize());
+                return new EBook(bookInfo);
             case "audio":
-                return new AudioBook(bookInfo, bookInfo.getNarrator(), bookInfo.getDuration());
+                return new AudioBook(bookInfo);
             default:
                 throw new IllegalArgumentException("Can't create book, Unknown material: " + material);
         }

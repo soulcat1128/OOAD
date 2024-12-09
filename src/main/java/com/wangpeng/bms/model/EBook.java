@@ -3,27 +3,41 @@ package com.wangpeng.bms.model;
 import java.math.BigDecimal;
 
 public class EBook implements IBook{
-    private Integer fileSize;
     public BookInfo bookInfo;
+    Integer fileSize;
+    String name;
+    String author;
+    BigDecimal price;
+    String desc;
+    Integer bookId;
+    String bookImg;
+    Integer bookTypeId;
 
-    public EBook(BookInfo bookInfo, Integer fileSize) {
+    public EBook(BookInfo bookInfo) {
         this.bookInfo = bookInfo;
-        this.fileSize = fileSize;
+        this.name = bookInfo.getBookname();
+        this.author = bookInfo.getBookauthor();
+        this.price = bookInfo.getBookprice();
+        this.desc = bookInfo.getBookdesc();
+        this.bookId = bookInfo.getBookid();
+        this.bookImg = bookInfo.getBookimg();
+        this.bookTypeId = bookInfo.getBooktypeid();
+        this.fileSize = bookInfo.getFileSize();
     }
 
     @Override
     public String getName() {
-        return bookInfo.getBookname();
+        return name;
     }
 
     @Override
     public String getAuthor() {
-        return bookInfo.getBookauthor();
+        return author;
     }
 
     @Override
     public BigDecimal getPrice() {
-        return bookInfo.getBookprice();
+        return price;
     }
 
     @Override
@@ -33,25 +47,33 @@ public class EBook implements IBook{
 
     @Override
     public String getDesc() {
-        return bookInfo.getBookdesc();
+        return desc;
     }
 
     @Override
     public Integer getId() {
-        return bookInfo.getBookid();
+        return bookId;
     }
 
     @Override
     public String getImg() {
-        return bookInfo.getBookimg();
+        return bookImg;
     }
 
     @Override
     public Integer getTypeId() {
-        return bookInfo.getBooktypeid();
+        return bookTypeId;
     }
 
-    public Integer getFileSize() {
-        return fileSize;
+    @Override
+    public void display() {
+        System.out.println("EBook: " + name + " by " + author);
+        System.out.println("price: $" + price);
+        System.out.println("Desc: " + desc);
+        System.out.println("File size: " + fileSize + " MB");
     }
+
+    public Integer getFileSize() { return fileSize; }
+
+
 }

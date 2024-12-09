@@ -4,12 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BookTest {
     private BookFactory bookFactory;
-    private BookInfo bookInfo;
     private IBook paperBook;
     private IBook eBook;
     private IBook audioBook;
@@ -17,9 +17,13 @@ public class BookTest {
     @BeforeEach
     public void setUp() {
         bookFactory = new BookFactory();
-        bookInfo = new BookInfo();
+        BookInfo bookInfo = new BookInfo();
+        bookInfo.setBookname("book");
+        bookInfo.setBookauthor("author");
+        bookInfo.setBookprice(BigDecimal.valueOf(99));
+        bookInfo.setBookdesc("desc");
         bookInfo.setMaterial("paper");
-        bookInfo.setPageCount(100);
+        bookInfo.setPageCount(123);
         paperBook = bookFactory.createBook(bookInfo);
         bookInfo.setMaterial("digital");
         bookInfo.setFileSize(100);
@@ -34,61 +38,44 @@ public class BookTest {
     public void testPaperBook() {
         assertEquals("paper", paperBook.getMaterial());
         assertTrue(paperBook instanceof PaperBook);
-        assertEquals(100, ((PaperBook)paperBook).getPageCount());
+        assertEquals(123, ((PaperBook)paperBook).getPageCount());
         assertEquals("paper", paperBook.getMaterial());
+        paperBook.display();
     }
 
     @Test
     public void testEBook() {
-        IBook book = bookFactory.createBook(bookInfo);
-        assertEquals("digital", book.getMaterial());
-        assertTrue(book instanceof EBook);
-        EBook eBook = (EBook) book;
-        assertEquals(100, eBook.getFileSize());
         assertEquals("digital", eBook.getMaterial());
+        assertTrue(eBook instanceof EBook);
+        assertEquals(100, ((EBook)eBook).getFileSize());
+        assertEquals("digital", eBook.getMaterial());
+        eBook.display();
     }
 
     @Test
     public void testAudioBook() {
-        BookFactory bookFactory = new BookFactory();
-        BookInfo bookInfo = new BookInfo();
-        bookInfo.setMaterial("audio");
-        bookInfo.setNarrator("narrator");
-        bookInfo.setDuration(100);
-        IBook book = bookFactory.createBook(bookInfo);
-        assertEquals("audio", book.getMaterial());
-        assertTrue(book instanceof AudioBook);
-        AudioBook audioBook = (AudioBook) book;
-        assertEquals("narrator", audioBook.getNarrator());
-        assertEquals(100, audioBook.getDuration());
         assertEquals("audio", audioBook.getMaterial());
+        assertTrue(audioBook instanceof AudioBook);
+        assertEquals("narrator", ((AudioBook)audioBook).getNarrator());
+        assertEquals(100, ((AudioBook)audioBook).getDuration());
+        assertEquals("audio", audioBook.getMaterial());
+        audioBook.display();
     }
 
     @Test
     public void testSeriesBook() {
-        BookFactory bookFactory = new BookFactory();
-        BookInfo bookInfo = new BookInfo();
-        bookInfo.setMaterial("paper");
-        bookInfo.setPageCount(100);
-        IBook book1 = bookFactory.createBook(bookInfo);
-        bookInfo.setMaterial("digital");
-        bookInfo.setFileSize(100);
-        IBook book2 = bookFactory.createBook(bookInfo);
-        bookInfo.setMaterial("audio");
-        bookInfo.setNarrator("narrator");
-        bookInfo.setDuration(100);
-        IBook book3 = bookFactory.createBook(bookInfo);
         List<IBook> books = new ArrayList<>();
-        books.add(book1);
-        books.add(book2);
-        books.add(book3);
+        books.add(paperBook);
+        books.add(eBook);
+        books.add(audioBook);
         IBook book = bookFactory.createBookSeries("series", books);
         assertTrue(book instanceof BookSeries);
         BookSeries bookSeries = (BookSeries) book;
-        assertEquals("series", bookSeries.getTitle());
-        assertEquals(book1, bookSeries.books.get(0));
-        assertEquals(book2, bookSeries.books.get(1));
-        assertEquals(book3, bookSeries.books.get(2));
+        assertEquals("series", bookSeries.getName());
+        assertEquals(paperBook, bookSeries.books.get(0));
+        assertEquals(eBook, bookSeries.books.get(1));
+        assertEquals(audioBook, bookSeries.books.get(2));
+        bookSeries.display();
     }
     
 }

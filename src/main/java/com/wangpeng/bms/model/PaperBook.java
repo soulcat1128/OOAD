@@ -5,25 +5,39 @@ import java.math.BigDecimal;
 public class PaperBook implements IBook {
     public BookInfo bookInfo;
     private Integer pageCount;
+    String name;
+    String author;
+    BigDecimal price;
+    String desc;
+    Integer bookId;
+    String bookImg;
+    Integer bookTypeId;
 
-    public PaperBook(BookInfo bookInfo, Integer pageCount) {
+    public PaperBook(BookInfo bookInfo) {
         this.bookInfo = bookInfo;
-        this.pageCount = pageCount;
+        this.pageCount = bookInfo.getPageCount();
+        this.name = bookInfo.getBookname();
+        this.author = bookInfo.getBookauthor();
+        this.price = bookInfo.getBookprice();
+        this.desc = bookInfo.getBookdesc();
+        this.bookId = bookInfo.getBookid();
+        this.bookImg = bookInfo.getBookimg();
+        this.bookTypeId = bookInfo.getBooktypeid();
     }
 
     @Override
     public String getName() {
-        return bookInfo.getBookname();
+        return name;
     }
 
     @Override
     public String getAuthor() {
-        return bookInfo.getBookauthor();
+        return author;
     }
 
     @Override
     public BigDecimal getPrice() {
-        return bookInfo.getBookprice();
+        return price;
     }
 
     @Override
@@ -33,25 +47,36 @@ public class PaperBook implements IBook {
 
     @Override
     public String getDesc() {
-        return bookInfo.getBookdesc();
+        return desc;
     }
 
     @Override
     public Integer getId() {
-        return bookInfo.getBookid();
+        return bookId;
     }
 
     @Override
     public String getImg() {
-        return bookInfo.getBookimg();
+        return bookImg;
     }
 
     @Override
     public Integer getTypeId() {
-        return bookInfo.getBooktypeid();
+        return bookTypeId;
+    }
+
+
+    @Override
+    public void display() {
+        System.out.println("PaperBook: " + name + " by " + author);
+        System.out.println("price: $" + price);
+        System.out.println("Description: " + desc);
+        System.out.println("Page Count: " + pageCount + " pages");
     }
 
     public Integer getPageCount() {
         return pageCount;
     }
+
+
 }
