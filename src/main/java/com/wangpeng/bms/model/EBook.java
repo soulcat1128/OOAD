@@ -12,6 +12,7 @@ public class EBook implements IBook{
     Integer bookId;
     String bookImg;
     Integer bookTypeId;
+    Byte BorrowedStatus;
 
     public EBook(BookInfo bookInfo) {
         this.bookInfo = bookInfo;
@@ -23,6 +24,7 @@ public class EBook implements IBook{
         this.bookImg = bookInfo.getBookimg();
         this.bookTypeId = bookInfo.getBooktypeid();
         this.fileSize = bookInfo.getFileSize();
+        this.BorrowedStatus = bookInfo.getIsborrowed();
     }
 
     @Override
@@ -63,6 +65,11 @@ public class EBook implements IBook{
     @Override
     public Integer getTypeId() {
         return bookTypeId;
+    }
+
+    @Override
+    public Byte getIsBorrowed() {
+        return BorrowedStatus;
     }
 
     @Override
