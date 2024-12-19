@@ -63,6 +63,11 @@ public class BookSeries implements IBook {
     }
 
     @Override
+    public Byte getIsBorrowed() {
+        throw new UnsupportedOperationException("does not support this operation.");
+    }
+
+    @Override
     public void display() {
         System.out.println("Book Series: " + title);
         for (IBook book : books) {

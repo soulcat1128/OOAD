@@ -11,6 +11,7 @@ public interface IBook {
     Integer getId();
     String getImg();
     Integer getTypeId();
+    Byte getIsBorrowed();
     default void add(IBook book) {
         throw new UnsupportedOperationException("does not support this operation.");
     } // Default: UnsupportedOperationException for non-series
