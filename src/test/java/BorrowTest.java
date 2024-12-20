@@ -16,6 +16,7 @@ import com.wangpeng.bms.model.Process;
 import com.wangpeng.bms.model.ReturnBook;
 import com.wangpeng.bms.model.TestObserver;
 import com.wangpeng.bms.model.UserObserver;
+import com.wangpeng.bms.model.User;
 
 public class BorrowTest {
 
@@ -84,6 +85,12 @@ public class BorrowTest {
         books.add(book3);
         books.add(book4);
         books.add(book5);
+
+        User user1 = new User();
+        user1.setUsername("User1");
+        User user2 = new User();
+        user2.setUsername("User2");
+
     }
 
     // 測試借書流程
@@ -91,8 +98,15 @@ public class BorrowTest {
     void testBorrow() {
         // 建立通知管理器群組
         NotificationManager notificationManager = new NotificationManager();
-        TestObserver testObserver = new TestObserver();
-        notificationManager.subscribe(testObserver);
+        UserObserver admin_1 = new UserObserver("admin_1");
+        UserObserver admin_2 = new UserObserver("admin_2");
+        Process borrowBook = new BorrowBook(books, notificationManager);
+        User user1 = new User("User1");
+        borrowBook.process(user1, book1);
+        //    此時會跳借閱通知 amdin_1 收到借閱通知 User1 借閱了 Java程式設計 類似如此(amdin_2也會)
+        borrowBook.process(user1, book2);
+
+
 
         // 借書流程
         Process borrowBook = new BorrowBook(books, 0, "User1", notificationManager);
