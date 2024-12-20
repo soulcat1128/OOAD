@@ -11,6 +11,11 @@ public class User implements Serializable {
 
     private Byte isadmin;
 
+    public User(Integer userid,String username) {
+        this.userid = userid;
+        this.username = username;
+    }
+
     public Integer getUserid() {
         return userid;
     }

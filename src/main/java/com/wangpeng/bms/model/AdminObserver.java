@@ -3,7 +3,7 @@ package com.wangpeng.bms.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestObserver implements Observer {
+public class AdminObserver implements Observer {
     private List<String> receivedMessages = new ArrayList<>();
 
     @Override

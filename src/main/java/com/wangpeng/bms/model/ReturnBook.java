@@ -1,36 +1,41 @@
 package com.wangpeng.bms.model;
 
+import java.util.Date;
 import java.util.List;
+import java.text.SimpleDateFormat;
 
 public class ReturnBook extends Process {
 
-    private List<BookInfo> books;   // 書庫清單
-    private int borrowBookId;   //  還書編號
-    private String username; // 還書人
+    private List<BookInfo> books; // 書籍列表
     private NotificationManager notificationManager;
-    private UserObserver User;  
-    public ReturnBook(List<BookInfo> books, int borrowBookId , String username , NotificationManager notificationManager) {
-        this.books = books;        
-        this.borrowBookId = borrowBookId;
-        this.username = username;
+
+    public ReturnBook(List<BookInfo> books, NotificationManager notificationManager) {
+        this.books = books;
         this.notificationManager = notificationManager;
-        User = new UserObserver();
-        notificationManager.subscribe(User);
     }
 
-    public void RecordUser() {
-        System.out.println("還書人:" + username);
-        books.get(borrowBookId).setReturnHistory(username); // 設定還書紀錄加入使用者名稱
+    public Boolean performOperation(IBook book) {
+        int id = book.getId();
+        books.get(id).setIsborrowed((byte) 0); // 設定書籍為未借出
+        return true;
     }
 
-    public void performOperation() {
-        books.get(borrowBookId).setIsborrowed((byte) 0); // 設定書籍為未借出
-    }
-
-    public void sendNotification() {
-        String message = "成功歸還 " + books.get(borrowBookId).getBookname();
+    public void sendNotification(IBook book) {
+        int id = book.getId();
+        String message = books.get(id).getBookname() + " 成功歸還!!";
         notificationManager.notifyObservers(message);
+    }
+
+    public Borrow returnecord(Borrow borrow) {
+        borrow.setReturntime(new Date());
+        SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd");
+        borrow.setReturntimestr(sdFormat.format(borrow.getReturntime()));
         System.out.println("--------------------");
-        notificationManager.unsubscribe(User);
+        return borrow;
+    }
+
+    @Override
+    Borrow Borrowrecord(User user, IBook book) {
+        return null;
     }
 }

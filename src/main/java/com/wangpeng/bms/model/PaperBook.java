@@ -12,6 +12,7 @@ public class PaperBook implements IBook {
     Integer bookId;
     String bookImg;
     Integer bookTypeId;
+    Byte BorrowedStatus;
 
     public PaperBook(BookInfo bookInfo) {
         this.bookInfo = bookInfo;
@@ -23,6 +24,7 @@ public class PaperBook implements IBook {
         this.bookId = bookInfo.getBookid();
         this.bookImg = bookInfo.getBookimg();
         this.bookTypeId = bookInfo.getBooktypeid();
+        this.BorrowedStatus = bookInfo.getIsborrowed();
     }
 
     @Override
@@ -65,6 +67,8 @@ public class PaperBook implements IBook {
         return bookTypeId;
     }
 
+    @Override
+    public Byte getIsBorrowed() { return BorrowedStatus; }
 
     @Override
     public void display() {

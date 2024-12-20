@@ -13,6 +13,7 @@ public class AudioBook implements IBook{
     Integer bookId;
     String bookImg;
     Integer bookTypeId;
+    Byte BorrowedStatus;
 
 
     public AudioBook(BookInfo bookInfo) {
@@ -25,6 +26,7 @@ public class AudioBook implements IBook{
         this.bookId = bookInfo.getBookid();
         this.bookImg = bookInfo.getBookimg();
         this.bookTypeId = bookInfo.getBooktypeid();
+        this.BorrowedStatus = bookInfo.getIsborrowed();
     }
 
     @Override
@@ -67,6 +69,10 @@ public class AudioBook implements IBook{
         return bookTypeId;
     }
 
+    @Override
+    public Byte getIsBorrowed() {
+        return BorrowedStatus;
+    }
 
     @Override
     public void display() {
