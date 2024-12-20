@@ -8,11 +8,9 @@ import com.wangpeng.bms.exception.NotEnoughException;
 public class BorrowBook extends Process{
 
     private List<BookInfo> books;   // 書庫清單
-    private int borrowBookId;   // 借書編號
-    private String username; // 借書人
     private NotificationManager notificationManager;
 
-    public BorrowBook(List<BookInfo> books, NotificationManager notificationManager) {
+    public BorrowBook(List<IBook> books, NotificationManager notificationManager) {
         this.books = books;
         this.notificationManager = notificationManager;
     }
@@ -40,10 +38,17 @@ public class BorrowBook extends Process{
         }
     }
 
-    public void sendNotification(User user) {
+    public Borrow sendNotification(User user) {
         String message = "成功借閱 " + books.get(borrowBookId).getBookname();
         notificationManager.notifyObservers(message);
+        Borrow newBorrowRecord = new Borrow();
+        newBorrowRecord.setBookid(books.get(borrowBookId).getId());
+        newBorrowRecord.setBookname(books.get(borrowBookId).getBookname());
+        newBorrowRecord.setUserid(user.getId());
+        newBorrowRecord.setUsername(user.getUsername());
+        newBorrowRecord.setBorrowtime(new Date());
         System.out.println("--------------------");
+        return newBorrowRecord;
     }
     
 }

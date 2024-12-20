@@ -5,27 +5,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.wangpeng.bms.model.*;
+import com.wangpeng.bms.model.Process;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
 import com.wangpeng.bms.exception.NotEnoughException;
-import com.wangpeng.bms.model.BookInfo;
-import com.wangpeng.bms.model.BorrowBook;
-import com.wangpeng.bms.model.NotificationManager;
-import com.wangpeng.bms.model.Process;
-import com.wangpeng.bms.model.ReturnBook;
-import com.wangpeng.bms.model.TestObserver;
-import com.wangpeng.bms.model.UserObserver;
-import com.wangpeng.bms.model.User;
 
 public class BorrowTest {
 
-    private List<BookInfo> books;
+    private List<IBook> books;
     private BookInfo book1;
     private BookInfo book2;
     private BookInfo book3;
     private BookInfo book4;
     private BookInfo book5;
+    private IBook bookObj1;
+    private IBook bookObj2;
+    private IBook bookObj3;
+    private IBook bookObj4;
+    private IBook bookObj5;
+    private User user1;
+    private User user2;
+    private List<Borrow> borrowRecords;
 
     // 初始化測試資料
     @BeforeEach
@@ -80,16 +83,29 @@ public class BorrowTest {
         book5.setBookdesc("《三國演義》又名《三國志演義》、《三國志通俗演義》，是我國小說史上最著名最傑出的長篇章回體歷史小說。");
         book5.setIsborrowed((byte) 0);
 
-        books.add(book1);
-        books.add(book2);
-        books.add(book3);
-        books.add(book4);
-        books.add(book5);
+        BookFactory bookFactory = new BookFactory();
+        IBook bookObj1 = bookFactory.createBook(book1);
+        IBook bookObj2 = bookFactory.createBook(book2);
+        IBook bookObj3 = bookFactory.createBook(book3);
+        IBook bookObj4 = bookFactory.createBook(book4);
+        IBook bookObj5 = bookFactory.createBook(book5);
 
+        books.add(bookObj1);
+        books.add(bookObj2);
+        books.add(bookObj3);
+        books.add(bookObj4);
+        books.add(bookObj5);
+
+//        創建用戶(借書者
         User user1 = new User();
         user1.setUsername("User1");
         User user2 = new User();
         user2.setUsername("User2");
+
+//        存放借閱歷史
+        List<Borrow> borrowRecords = new ArrayList<Borrow>();
+
+
 
     }
 
@@ -98,13 +114,17 @@ public class BorrowTest {
     void testBorrow() {
         // 建立通知管理器群組
         NotificationManager notificationManager = new NotificationManager();
-        UserObserver admin_1 = new UserObserver("admin_1");
-        UserObserver admin_2 = new UserObserver("admin_2");
+        // 創建觀察者
+        UserObserver admin_1 = new UserObserver("admin_1", notificationManager);
+        UserObserver admin_2 = new UserObserver("admin_2", notificationManager);
+
+//      // 創建借書流程
         Process borrowBook = new BorrowBook(books, notificationManager);
-        User user1 = new User("User1");
-        borrowBook.process(user1, book1);
-        //    此時會跳借閱通知 amdin_1 收到借閱通知 User1 借閱了 Java程式設計 類似如此(amdin_2也會)
-        borrowBook.process(user1, book2);
+
+//      // 借書流程
+        borrowRecords.add(borrowBook.process(bookObj1, user1)); // 借書 並加入到借閱紀錄
+        // 此時會跳借閱通知 amdin_1 收到借閱通知 User1 借閱了 Java程式設計 類似如此(amdin_2也會)
+        borrowRecords.add(borrowBook.process(bookObj2, user2));
 
 
 
