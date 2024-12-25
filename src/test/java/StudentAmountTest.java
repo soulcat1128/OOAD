@@ -4,51 +4,73 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.wangpeng.bms.model.*;
 
-
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
-public class StudentAmountTest {
-    
-    private StudentAmount studentAmount;
-    private Borrow borrow;
-    
-    @BeforeEach
-    public void setUp() {
-        studentAmount = new StudentAmount();
-        borrow = new Borrow();
-    }
-    
-    @Test
-    public void testCalculateWithinGracePeriod() {
-        // Set borrow date 15 days ago (within 30 days grace period)
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -15);
-        borrow.setBorrowtime(cal.getTime());
-        
-        double amount = studentAmount.calculate(borrow);
-        assertEquals(0.0, amount, 0.01);
-    }
-    
-    @Test
-    public void testCalculateFirstTenDaysAfterGracePeriod() {
-        // test after grace period 5 days
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -35);
-        borrow.setBorrowtime(cal.getTime());
-        
-        double amount = studentAmount.calculate(borrow);
-        assertEquals(25.0, amount, 0.01); // 5 * $5 = $25
-    }
-    
-    @Test
-    public void testCalculateAfterFirstTenDays() {
-        // test after grace period 15 days
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -45);
-        borrow.setBorrowtime(cal.getTime());
-        
-        double amount = studentAmount.calculate(borrow);
-        assertEquals(100.0, amount, 0.01); // (10 * $5) + (5 * $10) = $50 + $50 = $100
-    }
+class StudentAmountTest {
+   private StudentAmount calculator;
+   private Borrow borrow;
+   private PaperBook book;
+   private BookSeries series;
+   
+   @BeforeEach
+   void setUp() {
+       calculator = new StudentAmount();
+       borrow = new Borrow();
+
+       BookInfo bookInfo = new BookInfo();
+       bookInfo.setBookname("Test Book");
+       bookInfo.setBookauthor("Test Author");
+       bookInfo.setBookprice(new BigDecimal("29.99"));
+       bookInfo.setBookdesc("Test Description");
+       bookInfo.setPageCount(200);
+       book = new PaperBook(bookInfo);
+       
+       BookInfo bookInfo1 = new BookInfo();
+       bookInfo1.setBookname("Series Book 1");
+       bookInfo1.setBookauthor("Author 1"); 
+       AudioBook book1 = new AudioBook(bookInfo1);
+
+       BookInfo bookInfo2 = new BookInfo();
+       bookInfo2.setBookname("Series Book 2");  
+       bookInfo2.setBookauthor("Author 2");
+       EBook book2 = new EBook(bookInfo2);
+       
+       series = new BookSeries("Test Series", Arrays.asList(book1, book2));
+   }
+   
+   @Test
+   void testSingleBookWithinPeriod() {
+       Calendar cal = Calendar.getInstance();
+       cal.add(Calendar.DATE, -25);
+       borrow.setBorrowtime(cal.getTime());
+       assertEquals(0.0, calculator.calculate(book, borrow), 0.01);
+   }
+   
+   @Test
+   void testSingleBookFirstTenDays() {
+       Calendar cal = Calendar.getInstance();
+       cal.add(Calendar.DATE, -35);
+       borrow.setBorrowtime(cal.getTime());
+       assertEquals(25.0, calculator.calculate(book, borrow), 0.01);
+   }
+   
+   @Test
+   void testSingleBookAfterTenDays() {
+       Calendar cal = Calendar.getInstance();
+       cal.add(Calendar.DATE, -45);
+       borrow.setBorrowtime(cal.getTime());
+       assertEquals(100.0, calculator.calculate(book, borrow), 0.01);  // 50 + 50
+   }
+   
+   @Test
+   void testBookSeriesAfterPeriod() {
+       Calendar cal = Calendar.getInstance();
+       cal.add(Calendar.DATE, -50);
+       borrow.setBorrowtime(cal.getTime());
+       double expectedFine = (10 * 5.0 + 5 * 10.0) + (10 * 5.0);
+       assertEquals(expectedFine, calculator.calculate(series, borrow), 0.01);
+   }
 }
