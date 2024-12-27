@@ -9,7 +9,17 @@ public class User implements Serializable {
 
     private String userpassword;
 
+    private String jobTitle;
+
     private Byte isadmin;
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
 
     public Integer getUserid() {
         return userid;
