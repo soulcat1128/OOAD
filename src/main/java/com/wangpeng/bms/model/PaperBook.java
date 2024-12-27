@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public class PaperBook implements IBook {
     public BookInfo bookInfo;
     private Integer pageCount;
+    private long prefix = 0;
     String name;
     String author;
     BigDecimal price;
@@ -76,6 +77,11 @@ public class PaperBook implements IBook {
         System.out.println("price: $" + price);
         System.out.println("Description: " + desc);
         System.out.println("Page Count: " + pageCount + " pages");
+    }
+
+    @Override
+    public long getPrefix() {
+        return this.prefix;
     }
 
     public Integer getPageCount() {
