@@ -122,7 +122,12 @@ public class Borrow {
 
     @Override
     public String toString() {
-        String str = "用戶: " + username + ", 書籍: " + bookname + ", 借書時間: "
+        String str ;
+        if(returntimestr == null){
+            str = "用戶: " + username + ", 尚未歸還此書籍: "+ bookname; 
+            return str;
+        }
+        str = "用戶: " + username + ", 書籍: " + bookname + ", 借書時間: "
                 + borrowtimestr+ ", 還書時間: " + returntimestr;
         return str;
     }

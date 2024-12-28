@@ -12,3 +12,77 @@ Team members:
 近日，圖書館的管理工作日益繁瑣，如何有效管理借閱與歸還、追蹤圖書庫存，以及維護使用者資料，是許多圖書館面臨的共同挑戰。傳統的手動記錄方式不僅效率低下，還容易導致錯誤，甚至可能丟失重要資料。例如，當某本書被借出後未能及時更新庫存紀錄，可能導致其他讀者無法正常借閱。因此，我們希望設計一個圖書管理系統，利用現代化技術，提升管理效率，降低出錯率，並改善使用者體驗。
 
 我們希望透過此系統實現多項功能，包括支援圖書的新增、修改、刪除與查詢，幫助管理者隨時掌握館藏情況；記錄使用者的借閱與歸還歷史，並在逾期時提供自動提醒通知；以及生成圖書使用與庫存情況的報表，協助管理者進行數據分析。此外，系統還將提供簡便的檢索功能，讓使用者能夠快速找到所需圖書。
+
+## Description
+本專案是一個圖書管理系統，旨在有效地管理書籍的借閱和歸還操作。系統基於 Java 設計，包含多樣的書籍類型（如紙本書、有聲書和電子書）。
+為了實現上述功能，我們使用了數個設計模式，包括：
+1. **Factory Pattern**：
+2. **Composite Pattern**:
+
+3. **Template Method Pattern**：實現借書和還書的固定流程，減少重複程式碼。
+4. **Observer Pattern**：用於通知系統，實現借書/還書操作後的即時通知。
+
+5. **Strategy Pattern**
+
+## Future
+
+
+
+## Technique
+
+## Design Patterns Summary & Storyboard
+
+## Design Patterns in Our Code
+
+### Factory  Method
+- Motivation:
+
+- Solution:
+
+- Consequence:
+
+### Composite 
+- Motivation:
+
+- Solution:
+
+- Consequence:
+
+### Template Method
+
+- **Motivation:**  
+在設計一個圖書管理系統時，針對不同操作（如借書與還書），儘管每個操作的行為可能不同，這些操作的邏輯流程（例如檢查操作是否可行、通知相關人員以及記錄操作）卻是固定的。為了避免重複撰寫這些邏輯，並提升程式碼的可讀性與可維護性，我們選擇使用 Template Method Pattern。
+
+- **Solution:**  
+Template Method Pattern 定義了一個標準化的執行流程，具體的步驟由抽象方法實作。  
+在本專案中，`Process` 類別提供了一個固定的模板方法 `process()`，包含以下三個抽象步驟：  
+  1. **檢查操作是否可行** (`performOperation`)  
+  2. **發送通知** (`sendNotification`)  
+  3. **記錄操作** (`record`)  
+
+具體的實作，例如 `BorrowBook` 和 `ReturnBook`，分別繼承 `Process`，並實作這些抽象方法以處理各自的邏輯。
+
+- **Consequence:**  
+  - **程式更加簡潔：** 重複的程式碼被抽取到基底類別中，減少程式碼的冗餘。  
+  - **易於擴展：** 新增操作時，只需實作特定的抽象方法即可。  
+  - **高可維護性：** 共通邏輯集中管理，降低錯誤修改的風險。  
+
+### Observer
+
+- **Motivation:**  
+為了實現系統中通知機制（如借書或還書後即時通知）且降低不同模組間的相依性，我們需要一個解決方案，使得一個物件能主動通知多個對其感興趣的物件，並且不需直接關聯。
+
+- **Solution:**  
+我們採用了 Observer Pattern。`NotificationManager` 作為 Subject，提供 `subscribe` 和 `unsubscribe` 方法來管理觀察者，並透過 `notifyObservers` 方法負責廣播通知。  
+`Observer` 是一個接口，所有觀察者（如 `AdminObserver`）需實作其 `update` 方法以處理通知。
+
+- **Consequence:**  
+  - **可擴展性：** 新增觀察者時，只需實作 Observer 接口並註冊到 Subject 即可。  
+  - **提升測試性：** 觀察者的邏輯可以被單獨測試，增加系統的穩定性。  
+
+### Strategy 
+- Motivation:
+
+- Solution:
+
+- Consequence:

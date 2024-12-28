@@ -1,35 +1,29 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-
-import com.wangpeng.bms.exception.NotEnoughException;
-import com.wangpeng.bms.model.UserObserver;
 import com.wangpeng.bms.model.AdminObserver;
 import com.wangpeng.bms.model.BookFactory;
 import com.wangpeng.bms.model.BookInfo;
+import com.wangpeng.bms.model.BookSeries;
 import com.wangpeng.bms.model.Borrow;
 import com.wangpeng.bms.model.BorrowBook;
 import com.wangpeng.bms.model.IBook;
 import com.wangpeng.bms.model.NotificationManager;
 import com.wangpeng.bms.model.Process;
 import com.wangpeng.bms.model.ReturnBook;
-import com.wangpeng.bms.model.TestObserver;
 import com.wangpeng.bms.model.User;
-import com.wangpeng.bms.model.UserObserver;
 
 public class BorrowTest {
 
-    //書本集合
+    // 書本集合
     private List<BookInfo> books;
-    //借還記錄集合
+    // 借還記錄集合
     private List<Borrow> borrows;
     private BookFactory bookFactory;
     private BookInfo book1;
@@ -105,56 +99,179 @@ public class BorrowTest {
         books.add(book5);
     }
 
-    @Test
-    void testBorrowAndReturn() {
+    @Test // 單本書籍借還測試、觀察者模式測試
+    void test_SingleBook_Borrow_And_Return_And_Observer() {
         SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd");
         // 建立通知管理器群組
         NotificationManager notificationManager = new NotificationManager();
-        AdminObserver AdminObserver = new AdminObserver();//用來紀錄測試的通知訊息
+        AdminObserver AdminObserver = new AdminObserver();// 用來紀錄測試的通知訊息
         notificationManager.subscribe(AdminObserver);
 
         // 借書流程
-        Process borrowBook = new BorrowBook(books, notificationManager);
-        Process returnBook = new ReturnBook(books, notificationManager);
+        HashMap<User, Borrow> User_Borrow = new HashMap<>();
+        Process borrowBook = new BorrowBook(books, notificationManager, User_Borrow);
+        Process returnBook = new ReturnBook(books, notificationManager, User_Borrow);
         IBook book_1 = bookFactory.createBook(book1),
-              book_2 = bookFactory.createBook(book2),
-              book_3 = bookFactory.createBook(book3);
+                book_2 = bookFactory.createBook(book2),
+                book_3 = bookFactory.createBook(book3);
 
         User user_1 = new User(1, "User1"),
-             user_2 = new User(2, "User2"),
-             user_3 = new User(3, "User3");
+                user_2 = new User(2, "User2"),
+                user_3 = new User(3, "User3");
 
-        borrows.add(borrowBook.borrowprocess(book_1, user_1));
-        assertEquals("用戶: User1, 書籍: Java程式設計, 借書時間: "+sdFormat.format(new Date())+", 還書時間: null",borrows.get(0).toString());
+        // 新版測試
+        // 測試庫存足夠情況
+        borrowBook.process(book_1, user_1);// user1 借book1
+        borrowBook.process(book_2, user_2);// user2 借book2
+        returnBook.process(book_1, user_1);// user1 還book1
+        borrowBook.process(book_3, user_3);// user3 借book3
 
-        borrows.add(borrowBook.borrowprocess(book_1, user_2));
-        assertEquals((byte)1, books.get(book_1.getId()).getIsborrowed());
+        // 測試庫存不足情況
+        borrowBook.process(book_2, user_1);
+        borrowBook.process(book_3, user_2);
 
-        returnBook.returnprocess(book_1, user_1, borrows.get(0));
-        assertEquals("用戶: User1, 書籍: Java程式設計, 借書時間: "+sdFormat.format(new Date())+", 還書時間: "+sdFormat.format(new Date()),borrows.get(0).toString());
-        
-        borrows.add(borrowBook.borrowprocess(book_1, user_3));
-        assertEquals("用戶: User3, 書籍: Java程式設計, 借書時間: "+sdFormat.format(new Date())+", 還書時間: null",borrows.get(2).toString());
-       
-        borrows.add(borrowBook.borrowprocess(book_2, user_2));
-        assertEquals("用戶: User2, 書籍: 紅樓夢, 借書時間: "+sdFormat.format(new Date())+", 還書時間: null",borrows.get(3).toString());
-        
-        borrows.add(borrowBook.borrowprocess(book_3, user_1));
-        assertEquals("用戶: User1, 書籍: 西遊記, 借書時間: "+sdFormat.format(new Date())+", 還書時間: null",borrows.get(4).toString());
-        assertEquals((byte)1, books.get(book_1.getId()).getIsborrowed());
-        assertEquals((byte)1, books.get(book_2.getId()).getIsborrowed());
-        assertEquals((byte)1, books.get(book_3.getId()).getIsborrowed());
-        
-        returnBook.returnprocess(book_2, user_2, borrows.get(3));
-        assertEquals("用戶: User2, 書籍: 紅樓夢, 借書時間: "+sdFormat.format(new Date())+", 還書時間: "+sdFormat.format(new Date()),borrows.get(3).toString());
-        assertEquals((byte)0, books.get(book_2.getId()).getIsborrowed());
-        
-        returnBook.returnprocess(book_3, user_1, borrows.get(4));
-        assertEquals("用戶: User1, 書籍: 西遊記, 借書時間: "+sdFormat.format(new Date())+", 還書時間: "+sdFormat.format(new Date()),borrows.get(4).toString());
-        assertEquals((byte)0, books.get(book_3.getId()).getIsborrowed());
+        User_Borrow.forEach((k, v) -> {
+            System.out.println("用戶: " + k.getUsername() + ", 書籍: " + v.getBookname() + ", 借書時間: " + v.getBorrowtimestr()
+                    + ", 還書時間: " + v.getReturntimestr());
+        });
+        assertEquals("用戶: User1, 書籍: Java程式設計, 借書時間: " + sdFormat.format(new Date()) + ", 還書時間: "
+                + sdFormat.format(new Date()), User_Borrow.get(user_1).toString());
+        assertEquals("用戶: User2, 尚未歸還此書籍: 紅樓夢", User_Borrow.get(user_2).toString());
+        assertEquals("用戶: User3, 尚未歸還此書籍: 西遊記", User_Borrow.get(user_3).toString());
 
-        returnBook.returnprocess(book_1, user_3, borrows.get(2));
-        assertEquals("用戶: User3, 書籍: Java程式設計, 借書時間: "+sdFormat.format(new Date())+", 還書時間: "+sdFormat.format(new Date()),borrows.get(2).toString());
+        // 驗證觀察者收到的通知
+        List<String> messages = AdminObserver.getReceivedMessages();
+        for (String message : messages) {
+            System.out.println(message);
+        }
+        assertEquals(6, messages.size());
+        assertEquals("User1成功借閱 Java程式設計!!", messages.get(0));
+        assertEquals("User2成功借閱 紅樓夢!!", messages.get(1));
+        assertEquals("User1成功歸還 Java程式設計!!", messages.get(2));
+        assertEquals("User3成功借閱 西遊記!!", messages.get(3));
+        assertEquals("目前庫存不足無法借閱 紅樓夢!!", messages.get(4));
+        assertEquals("目前庫存不足無法借閱 西遊記!!", messages.get(5));
+
+    }
+
+    @Test // 系列書籍借還測試、觀察者模式測試
+    void test_MultiBooks_Borrow_And_Return_And_Observer() {
+        SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd");
+        // 建立通知管理器群組
+        NotificationManager notificationManager = new NotificationManager();
+        AdminObserver AdminObserver = new AdminObserver();// 用來紀錄測試的通知訊息
+        notificationManager.subscribe(AdminObserver);
+
+        // 借書流程
+        HashMap<User, Borrow> User_Borrow = new HashMap<>();
+        Process borrowBook = new BorrowBook(books, notificationManager, User_Borrow);
+        Process returnBook = new ReturnBook(books, notificationManager, User_Borrow);
+        IBook book_1 = bookFactory.createBook(book1),
+                book_2 = bookFactory.createBook(book2),
+                book_3 = bookFactory.createBook(book3),
+                book_4 = bookFactory.createBook(book4),
+                book_5 = bookFactory.createBook(book5);
+
+        List<IBook> Serieslist = new ArrayList<>();
+        Serieslist.add(book_2);
+        Serieslist.add(book_3);
+        Serieslist.add(book_4);
+        Serieslist.add(book_5);
+        BookSeries bookSeries = (BookSeries) bookFactory.createBookSeries("四大名著", Serieslist);
+
+        User user_1 = new User(1, "User1"),
+                user_2 = new User(2, "User2"),
+                user_3 = new User(3, "User3");
+
+        borrowBook.process(bookSeries, user_1);
+        borrowBook.process(bookSeries, user_2);
+        returnBook.process(bookSeries, user_1);
+        borrowBook.process(bookSeries, user_3);
+
+        User_Borrow.forEach((k, v) -> {
+            System.out.println("用戶: " + k.getUsername() + ", 書籍: " + v.getBookname() + ", 借書時間: " + v.getBorrowtimestr()
+                    + ", 還書時間: " + v.getReturntimestr());
+        });
+
+        assertEquals("用戶: User1, 書籍: 四大名著, 借書時間: " + sdFormat.format(new Date()) + ", 還書時間: "
+                + sdFormat.format(new Date()), User_Borrow.get(user_1).toString());
+        assertEquals("用戶: User3, 尚未歸還此書籍: 四大名著", User_Borrow.get(user_3).toString());
+
+        // 驗證觀察者收到的通知
+        List<String> messages = AdminObserver.getReceivedMessages();
+        for (String message : messages) {
+            System.out.println(message);
+        }
+
+        assertEquals(4, messages.size());
+        assertEquals("User1成功借閱 四大名著!!", messages.get(0));
+        assertEquals("目前庫存不足無法借閱 四大名著!!", messages.get(1));
+        assertEquals("User1成功歸還 四大名著!!", messages.get(2));
+        assertEquals("User3成功借閱 四大名著!!", messages.get(3));
+
+    }
+
+    @Test // 混和單本書籍和系列書籍借還測試、觀察者模式測試
+    void test_SingleBook_MultiBooks_Borrow_And_Return_And_Observer() {
+        SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd");
+        // 建立通知管理器群組
+        NotificationManager notificationManager = new NotificationManager();
+        AdminObserver AdminObserver = new AdminObserver();// 用來紀錄測試的通知訊息
+        notificationManager.subscribe(AdminObserver);
+
+        // 借書流程
+        HashMap<User, Borrow> User_Borrow = new HashMap<>();
+        Process borrowBook = new BorrowBook(books, notificationManager, User_Borrow);
+        Process returnBook = new ReturnBook(books, notificationManager, User_Borrow);
+        IBook book_1 = bookFactory.createBook(book1),
+                book_2 = bookFactory.createBook(book2),
+                book_3 = bookFactory.createBook(book3),
+                book_4 = bookFactory.createBook(book4),
+                book_5 = bookFactory.createBook(book5);
+
+        List<IBook> Serieslist = new ArrayList<>();
+        Serieslist.add(book_2);
+        Serieslist.add(book_3);
+        Serieslist.add(book_4);
+        Serieslist.add(book_5);
+        BookSeries bookSeries = (BookSeries) bookFactory.createBookSeries("四大名著", Serieslist);
+
+        User user_1 = new User(1, "User1"),
+                user_2 = new User(2, "User2"),
+                user_3 = new User(3, "User3");
+
+        User_Borrow.forEach((k, v) -> {
+            System.out.println("用戶: " + k.getUsername() + ", 書籍: " + v.getBookname() + ", 借書時間: " + v.getBorrowtimestr()
+                    + ", 還書時間: " + v.getReturntimestr());
+        });
+
+
+        //模擬測試系列書籍中某一本借出時，系列書籍會無法借出
+        borrowBook.process(book_2, user_1);
+        borrowBook.process(bookSeries, user_2);
+        returnBook.process(book_2, user_1);
+        borrowBook.process(bookSeries, user_2);
+
+        //模擬測試系列書籍借出時，該系列書籍中的每一本都會無法借出
+        borrowBook.process(book_4, user_3);
+        borrowBook.process(book_5, user_1);
+        returnBook.process(bookSeries, user_2);
+
+        //模擬測試系列書籍歸還時，即可借用系列書籍中的任何一本
+        borrowBook.process(book_5, user_1);
+        borrowBook.process(book_4, user_3);
+
+
+        User_Borrow.forEach((k, v) -> {
+            System.out.println("用戶: " + k.getUsername() + ", 書籍: " + v.getBookname() + ", 借書時間: " + v.getBorrowtimestr()
+                    + ", 還書時間: " + v.getReturntimestr());
+        });
+
+        assertEquals("用戶: User1, 尚未歸還此書籍: 三國演義", User_Borrow.get(user_1).toString());
+        assertEquals("用戶: User2, 書籍: 四大名著, 借書時間: " + sdFormat.format(new Date()) + ", 還書時間: "+ sdFormat.format(new Date()), User_Borrow.get(user_2).toString());
+        assertEquals("用戶: User3, 尚未歸還此書籍: 水滸傳", User_Borrow.get(user_3).toString());
+        
+
 
 
         // 驗證觀察者收到的通知
@@ -163,17 +280,15 @@ public class BorrowTest {
             System.out.println(message);
         }
 
-
         assertEquals(9, messages.size());
-        assertEquals("Java程式設計 成功借閱!!", messages.get(0));
-        assertEquals("Java程式設計 目前無法借閱!!", messages.get(1));
-        assertEquals("Java程式設計 成功歸還!!", messages.get(2));
-        assertEquals("Java程式設計 成功借閱!!", messages.get(3));
-        assertEquals("紅樓夢 成功借閱!!", messages.get(4));
-        assertEquals("西遊記 成功借閱!!", messages.get(5));
-        assertEquals("紅樓夢 成功歸還!!", messages.get(6));
-        assertEquals("西遊記 成功歸還!!", messages.get(7));
-        assertEquals("Java程式設計 成功歸還!!", messages.get(8));
-
+        assertEquals("User1成功借閱 紅樓夢!!", messages.get(0));
+        assertEquals("目前庫存不足無法借閱 四大名著!!", messages.get(1));
+        assertEquals("User1成功歸還 紅樓夢!!", messages.get(2));
+        assertEquals("User2成功借閱 四大名著!!", messages.get(3));
+        assertEquals("目前庫存不足無法借閱 水滸傳!!", messages.get(4));
+        assertEquals("目前庫存不足無法借閱 三國演義!!", messages.get(5));
+        assertEquals("User2成功歸還 四大名著!!", messages.get(6));
+        assertEquals("User1成功借閱 三國演義!!", messages.get(7));
+        assertEquals("User3成功借閱 水滸傳!!", messages.get(8));
     }
 }
