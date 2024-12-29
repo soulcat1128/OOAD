@@ -41,7 +41,7 @@ Team members:
 - ### 序列圖
 ![序列圖 圖片](image/SequenceDiagram.png)
 - ### Summary
-![Summary 圖片]()
+![Summary 圖片](image/Summary.png)
 - ### Storyboard
 ![Storyboard 圖片](image/storyboard.png)
 
