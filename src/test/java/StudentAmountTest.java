@@ -75,4 +75,19 @@ class StudentAmountTest {
        double expectedFine = (10 * 5.0 + 5 * 10.0) + (10 * 5.0);
        assertEquals(expectedFine, calculator.calculate(series, borrow), 0.01);
    }
+
+    @Test
+    void testNullBook() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            calculator.calculate(null, borrow);
+        });
+        assertEquals("Book and borrow cannot be null.", exception.getMessage());
+    }
+
+    @Test
+    void testEmptyBookSeries() {
+        BookSeries emptySeries = new BookSeries("Empty Series");
+        assertEquals(0.0, calculator.calculate(emptySeries, borrow), 0.01);
+    }
+
 }
