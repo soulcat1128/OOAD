@@ -26,7 +26,7 @@ public class BorrowBook extends Process {
             List<IBook> bookList = ((BookSeries) book).books;
             for (IBook b : bookList) {
                 if (books.get(b.getId()).getIsborrowed() == 1) {
-                    String message = "目前庫存不足無法借閱 " + title + "!!";
+                    String message = "目前庫存不足無法借閱 " + title + " 請管理員補貨!!";
                     notificationManager.notifyObservers(message);
                     return false;
                 }
@@ -37,7 +37,7 @@ public class BorrowBook extends Process {
         } else {
             int id = book.getId();
             if (books.get(id).getIsborrowed() == 1) {
-                String message = "目前庫存不足無法借閱 " + books.get(id).getBookname() + "!!";
+                String message = "目前庫存不足無法借閱 " + books.get(id).getBookname() + " 請管理員補貨!!";
                 notificationManager.notifyObservers(message);
                 return false;
             }
@@ -85,4 +85,5 @@ public class BorrowBook extends Process {
         System.out.println("--------------------");
         User_Borrow.put(user, newBorrowRecord);
     }
+
 }

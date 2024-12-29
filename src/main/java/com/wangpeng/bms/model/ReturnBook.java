@@ -1,5 +1,6 @@
 package com.wangpeng.bms.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,17 +19,35 @@ public class ReturnBook extends Process {
     }
 
     public Boolean performOperation(IBook book) {
-        if(book instanceof BookSeries){
+        if (book instanceof BookSeries) {
             List<IBook> bookList = ((BookSeries) book).books;
-            for (IBook b : bookList) {
-                books.get(b.getId()).setIsborrowed((byte) 0); // 設定書籍為未借出
+            List<Integer> successfullyReturnedBooks = new ArrayList<>(); // 記錄成功還書的書籍ID
+            try {
+                for (IBook b : bookList) {
+                    int id = b.getId();
+                    if (books.get(id).getIsborrowed() == 0) {
+                        throw new IllegalStateException("書籍 '" + books.get(id).getBookname() + "' 未借出，無法歸還!!");
+                    }
+                    books.get(id).setIsborrowed((byte) 0);
+                    successfullyReturnedBooks.add(id); // 記錄成功還書的書籍ID
+                }
+            } catch (Exception e) {
+                // 回滾已成功還書的書籍
+                for (int id : successfullyReturnedBooks) {
+                    books.get(id).setIsborrowed((byte) 1);
+                }
+                throw e;
             }
-        }else{
+        } else {
             int id = book.getId();
+            if (books.get(id).getIsborrowed() == 0) {
+                throw new IllegalStateException("書籍 '" + books.get(id).getBookname() + "' 未借出，無法歸還!!");
+            }
             books.get(id).setIsborrowed((byte) 0); // 設定書籍為未借出
         }
         return true;
     }
+
 
     public void sendNotification(User user, IBook book) {
         String username = user.getUsername(), bookname;

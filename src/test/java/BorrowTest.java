@@ -1,4 +1,6 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -130,6 +132,9 @@ public class BorrowTest {
         // 測試庫存不足情況
         borrowBook.process(book_2, user_1);
         borrowBook.process(book_3, user_2);
+        assertEquals((byte) 1, book2.getIsborrowed());
+        assertEquals((byte) 1, book3.getIsborrowed());
+
 
         User_Borrow.forEach((k, v) -> {
             System.out.println("用戶: " + k.getUsername() + ", 書籍: " + v.getBookname() + ", 借書時間: " + v.getBorrowtimestr()
@@ -150,8 +155,8 @@ public class BorrowTest {
         assertEquals("User2成功借閱 紅樓夢!!", messages.get(1));
         assertEquals("User1成功歸還 Java程式設計!!", messages.get(2));
         assertEquals("User3成功借閱 西遊記!!", messages.get(3));
-        assertEquals("目前庫存不足無法借閱 紅樓夢!!", messages.get(4));
-        assertEquals("目前庫存不足無法借閱 西遊記!!", messages.get(5));
+        assertEquals("目前庫存不足無法借閱 紅樓夢 請管理員補貨!!", messages.get(4));
+        assertEquals("目前庫存不足無法借閱 西遊記 請管理員補貨!!", messages.get(5));
 
     }
 
@@ -207,7 +212,7 @@ public class BorrowTest {
 
         assertEquals(4, messages.size());
         assertEquals("User1成功借閱 四大名著!!", messages.get(0));
-        assertEquals("目前庫存不足無法借閱 四大名著!!", messages.get(1));
+        assertEquals("目前庫存不足無法借閱 四大名著 請管理員補貨!!", messages.get(1));
         assertEquals("User1成功歸還 四大名著!!", messages.get(2));
         assertEquals("User3成功借閱 四大名著!!", messages.get(3));
 
@@ -283,13 +288,112 @@ public class BorrowTest {
 
         assertEquals(9, messages.size());
         assertEquals("User1成功借閱 紅樓夢!!", messages.get(0));
-        assertEquals("目前庫存不足無法借閱 四大名著!!", messages.get(1));
+        assertEquals("目前庫存不足無法借閱 四大名著 請管理員補貨!!", messages.get(1));
         assertEquals("User1成功歸還 紅樓夢!!", messages.get(2));
         assertEquals("User2成功借閱 四大名著!!", messages.get(3));
-        assertEquals("目前庫存不足無法借閱 水滸傳!!", messages.get(4));
-        assertEquals("目前庫存不足無法借閱 三國演義!!", messages.get(5));
+        assertEquals("目前庫存不足無法借閱 水滸傳 請管理員補貨!!", messages.get(4));
+        assertEquals("目前庫存不足無法借閱 三國演義 請管理員補貨!!", messages.get(5));
         assertEquals("User2成功歸還 四大名著!!", messages.get(6));
         assertEquals("User1成功借閱 三國演義!!", messages.get(7));
         assertEquals("User3成功借閱 水滸傳!!", messages.get(8));
+    }
+
+    @Test
+    public void testObserverBehavior() {
+        NotificationManager notificationManager = new NotificationManager();
+        AdminObserver adminObserver1 = new AdminObserver();
+        AdminObserver adminObserver2 = new AdminObserver();
+
+        // 測試無觀察者的情況
+        notificationManager.notifyObservers("No observers should receive this message.");
+        assertEquals(0, adminObserver1.getReceivedMessages().size());
+
+        // 測試添加觀察者
+        notificationManager.subscribe(adminObserver1);
+        notificationManager.notifyObservers("Message to Observer1");
+        assertEquals(1, adminObserver1.getReceivedMessages().size());
+        assertEquals("Message to Observer1", adminObserver1.getReceivedMessages().get(0));
+
+        // 測試添加多個觀察者
+        notificationManager.subscribe(adminObserver2);
+        notificationManager.notifyObservers("Message to both Observers");
+        assertEquals(2, adminObserver1.getReceivedMessages().size());
+        assertEquals(1, adminObserver2.getReceivedMessages().size());
+        assertEquals("Message to both Observers", adminObserver1.getReceivedMessages().get(1));
+        assertEquals("Message to both Observers", adminObserver2.getReceivedMessages().get(0));
+
+        // 測試移除觀察者
+        notificationManager.unsubscribe(adminObserver1);
+        notificationManager.notifyObservers("Only Observer2 should receive this");
+        assertEquals(2, adminObserver1.getReceivedMessages().size()); // Observer1不再接收新消息
+        assertEquals(2, adminObserver2.getReceivedMessages().size());
+        assertEquals("Only Observer2 should receive this", adminObserver2.getReceivedMessages().get(1));
+    }
+
+    @Test
+    public void testBorrowWithNullBook() {
+        // 借書流程
+        HashMap<User, Borrow> User_Borrow = new HashMap<>();
+        Process borrowBook = new BorrowBook(books, new NotificationManager(), User_Borrow);
+        Process returnBook = new ReturnBook(books, new NotificationManager(), User_Borrow);
+        User user_1 = new User(1, "User1");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            borrowBook.process(null, user_1);
+        });
+
+        assertEquals("Book cannot be null.", exception.getMessage());
+    }
+
+    @Test
+    public void testReturnWithNullBook() {
+        // 借書流程
+        HashMap<User, Borrow> User_Borrow = new HashMap<>();
+        Process returnBook = new ReturnBook(books, new NotificationManager(), User_Borrow);
+        User user_1 = new User(1, "User1");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            returnBook.process(null, user_1);
+        });
+
+        assertEquals("Book cannot be null.", exception.getMessage());
+    }
+
+    @Test
+    public void testReturnNotBorrowedBook() {
+        // 借書流程
+        HashMap<User, Borrow> User_Borrow = new HashMap<>();
+        Process returnBook = new ReturnBook(books, new NotificationManager(), User_Borrow);
+        book1.setIsborrowed((byte) 0); // 模擬書籍未被借出
+        IBook book_1 = bookFactory.createBook(book1);
+        User user_1 = new User(1, "User1");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            returnBook.process(book_1, user_1);
+        });
+
+        assertEquals("書籍 'Java程式設計' 未借出，無法歸還!!", exception.getMessage());
+    }
+
+    @Test
+    public void testReturnNotBorrowedBookInSeries() {
+        // 借書流程
+        HashMap<User, Borrow> User_Borrow = new HashMap<>();
+        Process returnBook = new ReturnBook(books, new NotificationManager(), User_Borrow);
+        book1.setIsborrowed((byte) 1); // 模擬書籍已被借出
+        book2.setIsborrowed((byte) 0); // 模擬書籍未被借出
+        IBook book_1 = bookFactory.createBook(book1);
+        IBook book_2 = bookFactory.createBook(book2);
+        BookSeries bookSeries = (BookSeries) bookFactory.createBookSeries("testSeries");
+        bookSeries.add(book_1);
+        bookSeries.add(book_2);
+        User user_1 = new User(1, "User1");
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            returnBook.process(bookSeries, user_1);
+        });
+
+        assertEquals("書籍 '紅樓夢' 未借出，無法歸還!!", exception.getMessage());
+        assertEquals((byte) 1, book1.getIsborrowed());
+        assertEquals((byte) 0, book2.getIsborrowed());
     }
 }

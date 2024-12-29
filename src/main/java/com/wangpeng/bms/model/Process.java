@@ -7,6 +7,12 @@ public abstract class Process {
     
     // Template Method: 定義固定的執行流程
     public final void process(IBook book, User user) {
+        if (book == null) {
+            throw new IllegalArgumentException("Book cannot be null.");
+        }
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null.");
+        }
         if(!performOperation(book)) // 檢查是否能執行操作
             return;     
         sendNotification(user,book);     // 發送通知
