@@ -74,11 +74,8 @@ public class EBook implements IBook{
     }
 
     @Override
-    public void display() {
-        System.out.println("EBook: " + name + " by " + author);
-        System.out.println("price: $" + price);
-        System.out.println("Desc: " + desc);
-        System.out.println("File size: " + fileSize + " MB");
+    public String display() {
+        return "EBook: " + name + " by " + author + ", price: " + price + ", desc: " + desc + ", file size: " + fileSize;
     }
 
     @Override

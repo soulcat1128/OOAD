@@ -16,8 +16,8 @@ Team members:
 ## Description
 本專案是一個圖書管理系統，旨在有效地管理書籍的借閱和歸還操作。系統基於 Java 設計，包含多樣的書籍類型（如紙本書、有聲書和電子書）。
 為了實現上述功能，我們使用了數個設計模式，包括：
-1. **Factory Pattern**：
-2. **Composite Pattern**:
+1. **Factory Pattern**：透過 BookFactory 類別實現，動態創建不同類型的書籍（如 PaperBook、AudioBook 和 EBook），並支援書籍系列（BookSeries）的生成，提升了系統的靈活性與可擴展性。
+2. **Composite Pattern**:藉由設計 IBook 接口，統一抽象化單本書和書籍系列的操作邏輯，並允許遞歸地組合書籍，支持更為複雜的層次結構管理。
 
 3. **Template Method Pattern**：實現借書和還書的固定流程，減少重複程式碼。
 4. **Observer Pattern**：用於通知系統，實現借書/還書操作後的即時通知。
@@ -35,18 +35,51 @@ Team members:
 ## Design Patterns in Our Code
 
 ### Factory  Method
-- Motivation:
+- **Motivation**:
+  在設計圖書管理系統時，為了能夠靈活地創建多種不同類型的書籍（例如紙本書、有聲書和電子書），我們需要一個能根據輸入參數自動生成對應類型書籍的工廠模式。這樣的設計可以簡化創建物件的過程，並使代碼更具可讀性和可擴展性。
 
-- Solution:
+- **Solution**:
+  在本專案中，BookFactory 類別實現了工廠模式。根據 BookInfo 的 material 屬性值，自動判斷應該創建哪一種類型的書籍對象。
 
-- Consequence:
+  1. 當 material 為 **"paper"** 時，創建 **PaperBook** 對象。
+
+  2. 當 material 為 **"audio"** 時，創建 **AudioBook** 對象。
+
+  3. 當 material 為 **"digital"** 時，創建 **EBook** 對象。
+
+  4. 若為未知的 material，則拋出異常。
+
+此外，BookFactory 還支援創建書籍系列（BookSeries），實現多本書籍的分層結構。
+
+- **Consequence**:
+
+  - **靈活性**： 工廠模式提供了一個統一的接口來創建不同的書籍類型，擴展新書籍類型時只需新增對應的類別即可。
+
+  - **簡化程式**： 將創建邏輯集中在工廠類別中，減少重複代碼。
+
+  - **可維護性**： 修改創建邏輯時只需更新工廠類別，而無需遍歷整個系統的其他部分。
 
 ### Composite 
-- Motivation:
+- **Motivation**:
+  在圖書管理系統中，有時需要對單一本書和一組書籍進行統一處理，例如顯示書籍資訊或計算總價。單一本書和書籍系列（例如套書）應該被視為相同的對象，從而簡化處理邏輯。
 
-- Solution:
 
-- Consequence:
+- **Solution**:
+  我們採用了 Composite Pattern，設計了 IBook 作為書籍的抽象接口，並將書籍系列（BookSeries）與單一本書（如 PaperBook, AudioBook, EBook）統一抽象。
+
+  - IBook 提供通用方法，如 getName()、display()，以及針對書籍系列的 add() 和 remove() 默認實作。
+
+  -  單一本書實現 IBook，提供具體的書籍資訊。
+
+  - 書籍系列 BookSeries 作為 Composite 類別，可以包含其他 IBook 實例，無論是單本書還是嵌套的書籍系列。
+
+
+- **Consequence**:
+  - **簡化邏輯**： 使用者可以用相同的方式處理單一本書和書籍系列。
+
+  - **易於擴展**： 可以輕鬆新增其他類型的書籍類別，而無需改變 Composite 的邏輯。
+
+  - **層次結構清晰**： 書籍系列可以包含子系列，形成遞歸結構，支持複雜的書籍管理需求。
 
 ### Template Method
 

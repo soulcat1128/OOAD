@@ -76,12 +76,8 @@ public class AudioBook implements IBook{
     }
 
     @Override
-    public void display() {
-        System.out.println("AudioBook: " + name + " by " + author);
-        System.out.println("Price: $" + price);
-        System.out.println("Description: " + desc);
-        System.out.println("Narrator: " + narrator);
-        System.out.println("Duration: " + duration + " minutes");
+    public String display() {
+        return "AudioBook: " + name + " by " + author + ", price: " + price + ", desc: " + desc + ", narrator: " + narrator + ", duration: " + duration + " min";
     }
 
     @Override

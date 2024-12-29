@@ -19,6 +19,7 @@ import com.wangpeng.bms.model.Process;
 import com.wangpeng.bms.model.ReturnBook;
 import com.wangpeng.bms.model.User;
 
+
 public class BorrowTest {
 
     // 書本集合
@@ -172,12 +173,13 @@ public class BorrowTest {
                 book_4 = bookFactory.createBook(book4),
                 book_5 = bookFactory.createBook(book5);
 
-        List<IBook> Serieslist = new ArrayList<>();
-        Serieslist.add(book_2);
-        Serieslist.add(book_3);
-        Serieslist.add(book_4);
-        Serieslist.add(book_5);
-        BookSeries bookSeries = (BookSeries) bookFactory.createBookSeries("四大名著", Serieslist);
+        BookSeries bookSeries = (BookSeries) bookFactory.createBookSeries("四大名著");
+        bookSeries.add(book_2);
+        bookSeries.add(book_3);
+        bookSeries.add(book_4);
+        bookSeries.add(book_5);
+
+
 
         User user_1 = new User(1, "User1"),
                 user_2 = new User(2, "User2"),
@@ -229,12 +231,11 @@ public class BorrowTest {
                 book_4 = bookFactory.createBook(book4),
                 book_5 = bookFactory.createBook(book5);
 
-        List<IBook> Serieslist = new ArrayList<>();
-        Serieslist.add(book_2);
-        Serieslist.add(book_3);
-        Serieslist.add(book_4);
-        Serieslist.add(book_5);
-        BookSeries bookSeries = (BookSeries) bookFactory.createBookSeries("四大名著", Serieslist);
+        BookSeries bookSeries = (BookSeries) bookFactory.createBookSeries("四大名著");
+        bookSeries.add(book_2);
+        bookSeries.add(book_3);
+        bookSeries.add(book_4);
+        bookSeries.add(book_5);
 
         User user_1 = new User(1, "User1"),
                 user_2 = new User(2, "User2"),

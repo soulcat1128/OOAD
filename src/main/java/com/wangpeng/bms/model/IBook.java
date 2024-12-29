@@ -18,7 +18,7 @@ public interface IBook {
     default void remove(IBook book) {
         throw new UnsupportedOperationException("does not support this operation.");
     }
-    void display();
+    String display();
     public default long getPrefix() {
         return 0;
     }

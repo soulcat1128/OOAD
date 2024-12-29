@@ -38,7 +38,9 @@ class ProfessorAmountTest {
        bookInfo2.setBookauthor("Author 2");
        EBook book2 = new EBook(bookInfo2);
        
-       series = new BookSeries("Test Series", Arrays.asList(book1, book2));
+       series = new BookSeries("Test Series");
+       series.add(book1);
+       series.add(book2);
    }
    
    @Test

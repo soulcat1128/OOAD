@@ -1,15 +1,15 @@
 package com.wangpeng.bms.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookSeries implements IBook {
     private String title;
-    public List<IBook> books;
+    public List<IBook> books = new ArrayList<IBook>();
 
-    public BookSeries(String title, List<IBook> books) {
+    public BookSeries(String title) {
         this.title = title;
-        this.books = books;
     }
 
     @Override
@@ -68,11 +68,24 @@ public class BookSeries implements IBook {
     }
 
     @Override
-    public void display() {
-        System.out.println("Book Series: " + title);
+    public String display() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("BookSeries: ").append(title).append(" contains: \n");
         for (IBook book : books) {
-            book.display();
-            System.out.println();
+            if (book instanceof BookSeries) {
+                String nestedDisplay = ((BookSeries) book).display();
+                for (String line : nestedDisplay.split("\n")) {
+                    builder.append("  ").append(line).append("\n");
+                }
+            } else {
+                builder.append("  ").append(book.display()).append("\n");
+            }
         }
+        return builder.toString().replace("\r\n", "\n").trim(); // 強制標準化為 Unix 格式
     }
+
+
+
+
+
 }
