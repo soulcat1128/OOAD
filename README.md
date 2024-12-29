@@ -37,9 +37,9 @@ Team members:
    
 ## Design Patterns Summary & Storyboard
 - ### 類別圖
-![類別圖 圖片]()
+![類別圖 圖片](image\ClassDiagram.png)
 - ### 序列圖
-![序列圖 圖片]()
+![序列圖 圖片](image\SequenceDiagram.png)
 - ### Summary
 ![Summary 圖片]()
 - ### Storyboard
