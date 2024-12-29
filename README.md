@@ -22,7 +22,7 @@ Team members:
 3. **Template Method Pattern**：實現借書和還書的固定流程，減少重複程式碼。
 4. **Observer Pattern**：用於通知系統，實現借書/還書操作後的即時通知。
 
-5. **Strategy Pattern**
+5. **Strategy Pattern**：用於計算逾期時的罰金。
 
 ## Future
 
