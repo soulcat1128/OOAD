@@ -36,12 +36,27 @@ Team members:
    現有的費用計算邏輯依據不同使用者角色（如學生、教授）進行分級計算，未來可以加入優惠政策，例如長期借閱折扣、會員制度或積分兌換機制，提升用戶滿意度。
    
 ## Design Patterns Summary & Storyboard
+
 - ### 類別圖
-![類別圖 圖片](image/ClassDiagram.png)
+
+![](image/Factory.png)
+
+
+![](image/Composite.png)
+
+  
+![](image/Template.png)
+
+
+![](image/Observer.png)
+
+
+![](image/Strategy.png)
+
 - ### 序列圖
 ![序列圖 圖片](image/SequenceDiagram.png)
 - ### Summary
-![Summary 圖片](image/Summary.png)
+![Summary 圖片](image/ClassDiagram.png)
 - ### Storyboard
 ![Storyboard 圖片](image/storyboard.png)
 
