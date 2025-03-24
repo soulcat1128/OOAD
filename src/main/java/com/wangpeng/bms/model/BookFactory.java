@@ -19,8 +19,8 @@ public class BookFactory {
         }
     }
 
-    public IBook createBookSeries(String title, List<IBook> books) {
-        return new BookSeries(title, books);
+    public IBook createBookSeries(String title) {
+        return new BookSeries(title);
     }
 
 }

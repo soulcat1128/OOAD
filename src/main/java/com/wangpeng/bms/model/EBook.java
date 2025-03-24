@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class EBook implements IBook{
     public BookInfo bookInfo;
+    private long prefix = 10;
     Integer fileSize;
     String name;
     String author;
@@ -73,11 +74,13 @@ public class EBook implements IBook{
     }
 
     @Override
-    public void display() {
-        System.out.println("EBook: " + name + " by " + author);
-        System.out.println("price: $" + price);
-        System.out.println("Desc: " + desc);
-        System.out.println("File size: " + fileSize + " MB");
+    public String display() {
+        return "EBook: " + name + " by " + author + ", price: " + price + ", desc: " + desc + ", file size: " + fileSize;
+    }
+
+    @Override
+    public long getPrefix() {
+        return this.prefix;
     }
 
     public Integer getFileSize() { return fileSize; }

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class AudioBook implements IBook{
     public BookInfo bookInfo;
+    private long prefix = 5;
     String narrator;
     Integer duration;
     String name;
@@ -75,12 +76,13 @@ public class AudioBook implements IBook{
     }
 
     @Override
-    public void display() {
-        System.out.println("AudioBook: " + name + " by " + author);
-        System.out.println("Price: $" + price);
-        System.out.println("Description: " + desc);
-        System.out.println("Narrator: " + narrator);
-        System.out.println("Duration: " + duration + " minutes");
+    public String display() {
+        return "AudioBook: " + name + " by " + author + ", price: " + price + ", desc: " + desc + ", narrator: " + narrator + ", duration: " + duration + " min";
+    }
+
+    @Override
+    public long getPrefix() {
+        return this.prefix;
     }
 
     public String getNarrator() { return narrator; }

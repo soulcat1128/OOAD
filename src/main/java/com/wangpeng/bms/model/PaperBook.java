@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public class PaperBook implements IBook {
     public BookInfo bookInfo;
     private Integer pageCount;
+    private long prefix = 0;
     String name;
     String author;
     BigDecimal price;
@@ -71,11 +72,13 @@ public class PaperBook implements IBook {
     public Byte getIsBorrowed() { return BorrowedStatus; }
 
     @Override
-    public void display() {
-        System.out.println("PaperBook: " + name + " by " + author);
-        System.out.println("price: $" + price);
-        System.out.println("Description: " + desc);
-        System.out.println("Page Count: " + pageCount + " pages");
+    public String display() {
+        return "PaperBook: " + name + " by " + author + ", price: " + price + ", desc: " + desc + ", page count: " + pageCount;
+    }
+
+    @Override
+    public long getPrefix() {
+        return this.prefix;
     }
 
     public Integer getPageCount() {
