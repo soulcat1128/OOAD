@@ -19,4 +19,7 @@ public interface IBook {
         throw new UnsupportedOperationException("does not support this operation.");
     }
     void display();
+    public default long getPrefix() {
+        return 0;
+    }
 }
