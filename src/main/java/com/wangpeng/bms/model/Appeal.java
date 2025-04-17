@@ -1,6 +1,5 @@
 package com.wangpeng.bms.model;
 
-
 import java.util.Date;
 
 public class Appeal {
@@ -8,15 +7,17 @@ public class Appeal {
 
     private Integer userid;
     
-    private Date appealtime;
+    private Date createTime;
 
-    private Boolean appealStatus;
+    private Byte status;
 
-    public Integer getAppealid() {
+    private String appealContent;
+
+    public Integer getAppealId() {
         return appealid;
     }
 
-    public void setAppealid(Integer appealid) {
+    public void setAppealId(Integer appealid) {
         this.appealid = appealid;
     }
 
@@ -28,19 +29,27 @@ public class Appeal {
         this.userid = userid;
     }
 
-    public Date getAppealtime() {
-        return appealtime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setAppealtime(Date appealtime) {
-        this.appealtime = appealtime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public Boolean getAppealStatus() {
-        return appealStatus;
+    public Byte getAppealStatus() {
+        return status;
     }
 
-    public void setAppealStatus(Boolean appealStatus) {
-        this.appealStatus = appealStatus;
+    public void setAppealStatus(Byte status) {
+        this.status = status;
+    }
+
+    public String getAppealContent() {
+        return appealContent;
+    }
+
+    public void setAppealContent(String appealContent) {
+        this.appealContent = appealContent;
     }
 }

@@ -7,7 +7,7 @@ public class ReservationRecord {
 
     private Integer bookid;
 
-    private Boolean reservationStatus;
+    private Boolean status;
 
     public Integer getReservationid() {
         return reservationid;
@@ -34,11 +34,11 @@ public class ReservationRecord {
     }
 
     public Boolean getReservationStatus() {
-        return reservationStatus;
+        return status;
     }
 
     public void setReservationStatus(Boolean reservationStatus) {
-        this.reservationStatus = reservationStatus;
+        this.status = reservationStatus;
     }
 
 }

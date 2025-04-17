@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangpeng.bms.mapper.AppealMapper">
+    <resultMap id="BaseResultMap" type="com.wangpeng.bms.model.Appeal">
+        <id column="appealId" property="appealid" jdbcType="INTEGER" />
+        <result column="userId" property="userid" jdbcType="INTEGER" />
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="appealContent" property="appealContent" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        appealId, userId, createTime, status, appealContent
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM appeal
+        WHERE appealId = #{appealId, jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM appeal
+        WHERE appealId = #{appealId, jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.wangpeng.bms.model.Appeal">
+        INSERT INTO appeal (appealId, userId, createTime, status, appealContent)
+        VALUES (#{appealid, jdbcType=INTEGER},
+                #{userid, jdbcType=INTEGER},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{status, jdbcType=TINYINT},
+                #{appealContent, jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.wangpeng.bms.model.Appeal">
+        INSERT INTO appeal
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="appealid != null">appealId,</if>
+            <if test="userid != null">userId,</if>
+            <if test="createTime != null">createTime,</if>
+            <if test="status != null">status,</if>
+            <if test="appealContent != null">appealContent,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="appealid != null">#{appealid, jdbcType=INTEGER},</if>
+            <if test="userid != null">#{userid, jdbcType=INTEGER},</if>
+            <if test="createTime != null">#{createTime, jdbcType=TIMESTAMP},</if>
+            <if test="status != null">#{status, jdbcType=TINYINT},</if>
+            <if test="appealContent != null">#{appealContent, jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.wangpeng.bms.model.Appeal">
+        UPDATE appeal
+        <set>
+            <if test="userid != null">userId = #{userid, jdbcType=INTEGER},</if>
+            <if test="createTime != null">createTime = #{createTime, jdbcType=TIMESTAMP},</if>
+            <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
+            <if test="appealContent != null">appealContent = #{appealContent, jdbcType=VARCHAR},</if>
+        </set>
+        WHERE appealId = #{appealid, jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.wangpeng.bms.model.Appeal">
+        UPDATE appeal
+        SET userId = #{userid, jdbcType=INTEGER},
+            createTime = #{createTime, jdbcType=TIMESTAMP},
+            status = #{status, jdbcType=TINYINT},
+            appealContent = #{appealContent, jdbcType=VARCHAR}
+        WHERE appealId = #{appealid, jdbcType=INTEGER}
+    </update>
+</mapper>

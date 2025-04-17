@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangpeng.bms.mapper.ReservationRecordMapper">
+    <resultMap id="BaseResultMap" type="com.wangpeng.bms.model.ReservationRecord">
+        <id column="reservationId" property="reservationid" jdbcType="INTEGER" />
+        <result column="userId" property="userid" jdbcType="INTEGER" />
+        <result column="bookId" property="bookid" jdbcType="INTEGER" />
+        <result column="status" property="status" jdbcType="BIT" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        reservationId, userId, bookId, status
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM reservation_record
+        WHERE reservationId = #{reservationId, jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM reservation_record
+        WHERE reservationId = #{reservationId, jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.wangpeng.bms.model.ReservationRecord">
+        INSERT INTO reservation_record (reservationId, userId, bookId, status)
+        VALUES (#{reservationid, jdbcType=INTEGER},
+                #{userid, jdbcType=INTEGER},
+                #{bookid, jdbcType=INTEGER},
+                #{status, jdbcType=BIT})
+    </insert>
+    <insert id="insertSelective" parameterType="com.wangpeng.bms.model.ReservationRecord">
+        INSERT INTO reservation_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reservationid != null">reservationId,</if>
+            <if test="userid != null">userId,</if>
+            <if test="bookid != null">bookId,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="reservationid != null">#{reservationid, jdbcType=INTEGER},</if>
+            <if test="userid != null">#{userid, jdbcType=INTEGER},</if>
+            <if test="bookid != null">#{bookid, jdbcType=INTEGER},</if>
+            <if test="status != null">#{status, jdbcType=BIT},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.wangpeng.bms.model.ReservationRecord">
+        UPDATE reservation_record
+        <set>
+            <if test="userid != null">userId = #{userid, jdbcType=INTEGER},</if>
+            <if test="bookid != null">bookId = #{bookid, jdbcType=INTEGER},</if>
+            <if test="status != null">status = #{status, jdbcType=BIT},</if>
+        </set>
+        WHERE reservationId = #{reservationid, jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.wangpeng.bms.model.ReservationRecord">
+        UPDATE reservation_record
+        SET userId = #{userid, jdbcType=INTEGER},
+            bookId = #{bookid, jdbcType=INTEGER},
+            status = #{status, jdbcType=BIT}
+        WHERE reservationId = #{reservationid, jdbcType=INTEGER}
+    </update>
+</mapper>

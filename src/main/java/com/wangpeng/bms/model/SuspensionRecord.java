@@ -7,7 +7,7 @@ public class SuspensionRecord {
 
     private Integer userid;
 
-    private Integer bookid;
+    private Integer borrowid;
 
     private Date startDate;
 
@@ -15,7 +15,7 @@ public class SuspensionRecord {
 
     private String suspensionReason;
 
-    private Boolean borrowingPermission;
+    private Byte borrowingPermission;
 
     public Integer getSuspensionid() {
         return suspensionid;
@@ -33,12 +33,12 @@ public class SuspensionRecord {
         this.userid = userid;
     }
 
-    public Integer getBookid() {
-        return bookid;
+    public Integer getBorrowid() {
+        return borrowid;
     }
 
-    public void setBookid(Integer bookid) {
-        this.bookid = bookid;
+    public void setBorrowid(Integer borrowid) {
+        this.borrowid = borrowid;
     }
 
     public Date getStartDate() {
@@ -65,11 +65,11 @@ public class SuspensionRecord {
         this.suspensionReason = suspensionReason;
     }
 
-    public Boolean getBorrowingPermission() {
+    public Byte getBorrowingPermission() {
         return borrowingPermission;
     }
 
-    public void setBorrowingPermission(Boolean borrowingPermission) {
+    public void setBorrowingPermission(Byte borrowingPermission) {
         this.borrowingPermission = borrowingPermission;
     }
 }
