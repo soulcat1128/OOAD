@@ -58,4 +58,54 @@
             status = #{status, jdbcType=BIT}
         WHERE reservationId = #{reservationid, jdbcType=INTEGER}
     </update>
+    <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM reservation_record
+        WHERE userId = #{userId, jdbcType=INTEGER}
+    </select>
+    <select id="selectByBookId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM reservation_record
+        WHERE bookId = #{bookId, jdbcType=INTEGER}
+        ORDER BY reservationId
+    </select>
+    <select id="selectByBookIdAndUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM reservation_record
+        WHERE bookId = #{bookId, jdbcType=INTEGER}
+        AND userId = #{userId, jdbcType=INTEGER}
+    </select>
+    <select id="selectCountBySearch" resultType="int">
+        SELECT COUNT(*)
+        FROM reservation_record rr
+        INNER JOIN user u ON rr.userId = u.userId
+        INNER JOIN book_info b ON rr.bookId = b.bookId
+        <where>
+            <if test="username != null and username != ''">
+                AND u.userName LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="userid != null and userid != ''">
+                AND rr.userId = #{userid}
+            </if>
+        </where>
+    </select>
+    <select id="selectBySearch" resultMap="BaseResultMap">
+        SELECT rr.reservationId, rr.userId, rr.bookId, rr.status,
+        u.userName, b.bookName
+        FROM reservation_record rr
+        INNER JOIN user u ON rr.userId = u.userId
+        INNER JOIN book_info b ON rr.bookId = b.bookId
+        <where>
+            <if test="username != null and username != ''">
+                AND u.userName LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="userid != null and userid != ''">
+                AND rr.userId = #{userid}
+            </if>
+        </where>
+        LIMIT #{begin}, #{size}
+    </select>
 </mapper>
