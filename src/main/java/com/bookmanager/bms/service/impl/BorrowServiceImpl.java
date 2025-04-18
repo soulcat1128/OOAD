@@ -35,6 +35,7 @@ public class BorrowServiceImpl implements BorrowService {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if(borrow.getBorrowtime() != null) borrow.setBorrowtimestr(simpleDateFormat.format(borrow.getBorrowtime()));
             if(borrow.getReturntime() != null) borrow.setReturntimestr(simpleDateFormat.format(borrow.getReturntime()));
+            if(borrow.getExpectedReturnTime() != null) borrow.setExpectedReturnTimeStr(simpleDateFormat.format(borrow.getExpectedReturnTime()));
         }
         return borrows;
     }
@@ -111,6 +112,7 @@ public class BorrowServiceImpl implements BorrowService {
         try {
             borrow.setBorrowtime(simpleDateFormat.parse(borrow.getBorrowtimestr()));
             borrow.setReturntime(simpleDateFormat.parse(borrow.getReturntimestr()));
+            borrow.setExpectedReturnTimeStr(simpleDateFormat.format(borrow.getExpectedReturnTime()));
         } catch (ParseException e) {
             e.printStackTrace();
         }

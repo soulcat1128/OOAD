@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -145,6 +147,58 @@ public class BorrowController {
             return 0;
         }
         return 1;
+    }
+
+    @RequestMapping(value = {"/extendBorrow", "/reader/extendBorrow"})
+    @Transactional
+    public Map<String, Object> extendBorrow(Integer borrowid, Integer bookid) {
+        try {
+            // 查詢借書的情況
+            Borrow theBorrow = borrowService.queryBorrowsById(borrowid);
+
+            if (theBorrow == null) {
+                return MyResult.getResultMap(1, "借閱記錄不存在");
+            }
+
+            if (theBorrow.getReturntime() != null) {
+                return MyResult.getResultMap(2, "該書籍已歸還，無法延長借閱");
+            }
+
+            if (theBorrow.getIsExtended() != null && theBorrow.getIsExtended() == 1) {
+                return MyResult.getResultMap(3, "該借閱已經延長過，每次借閱只能延長一次");
+            }
+
+            // 檢查是否已逾期
+            Date now = new Date();
+
+            if (now.after(theBorrow.getExpectedReturnTime())) {
+                return MyResult.getResultMap(4, "該借閱已超過原借閱期限，故無法延長");
+            }
+
+            // 設置isExtended為1，並延長借閱期限 14 天
+            theBorrow.setIsExtended(1);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(theBorrow.getExpectedReturnTime()); // 原始到期日
+            calendar.add(Calendar.DAY_OF_MONTH, 14);
+            Date newDueDate = calendar.getTime();
+            theBorrow.setExpectedReturnTime(newDueDate);
+
+            Integer res = borrowService.updateBorrow2(theBorrow);
+
+            if (res == 0) {
+                return MyResult.getResultMap(5, "延長借閱失敗，系統錯誤");
+            }
+
+            // 成功延長，返回新的到期日期
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            return MyResult.getResultMap(0, "延長成功，新的歸還日期為: " + sdf.format(newDueDate));
+
+        } catch (Exception e) {
+            System.out.println("發生異常，進行手動回滾");
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            e.printStackTrace();
+            return MyResult.getResultMap(1, "系統錯誤: " + e.getMessage());
+        }
     }
 
 }
