@@ -21,6 +21,13 @@ public class Borrow {
 
     private String returntimestr;
 
+    private Date expectedReturnTime;
+
+    private String expectedReturnTimeStr;
+
+    private Integer isExtended;
+
+
     public Integer getBorrowid() {
         return borrowid;
     }
@@ -92,4 +99,16 @@ public class Borrow {
     public void setReturntimestr(String returntimestr) {
         this.returntimestr = returntimestr;
     }
+
+    public Date getExpectedReturnTime() { return expectedReturnTime; }
+
+    public void setExpectedReturnTime(Date expectedReturnTime) { this.expectedReturnTime = expectedReturnTime; }
+
+    public String getExpectedReturnTimeStr() { return expectedReturnTimeStr; }
+
+    public void setExpectedReturnTimeStr(String expectedReturnTimeStr) { this.expectedReturnTimeStr = expectedReturnTimeStr; }
+
+    public Integer getIsExtended() { return isExtended;}
+
+    public void setIsExtended(Integer isExtended) { this.isExtended = isExtended; }
 }

@@ -110,6 +110,8 @@ CREATE TABLE `borrow`  (
                            `bookId` int(11) NOT NULL,
                            `borrowTime` datetime NOT NULL,
                            `returnTime` datetime NULL DEFAULT NULL,
+                           `expectedReturnTime` datetime NOT NULL,
+                           `isExtended` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0表示未延長，1表示已延長',
                            PRIMARY KEY (`borrowId`) USING BTREE,
                            INDEX `fk_borrow_user_1`(`userId`) USING BTREE,
                            INDEX `fk_borrow_book_info_1`(`bookId`) USING BTREE,
@@ -120,14 +122,14 @@ CREATE TABLE `borrow`  (
 -- ----------------------------
 -- Records of borrow
 -- ----------------------------
-INSERT INTO `borrow` VALUES (26, 11, 2, '2021-11-18 14:24:06', '2021-11-18 16:07:03');
-INSERT INTO `borrow` VALUES (27, 11, 1, '2021-11-18 15:01:31', '2021-11-18 16:07:06');
-INSERT INTO `borrow` VALUES (28, 11, 4, '2021-11-18 15:22:05', '2021-11-18 16:07:08');
-INSERT INTO `borrow` VALUES (30, 14, 2, '2021-11-18 16:52:05', '2021-11-19 20:55:10');
-INSERT INTO `borrow` VALUES (32, 14, 4, '2021-11-18 16:52:17', '2021-11-18 16:52:41');
-INSERT INTO `borrow` VALUES (38, 14, 1, '2021-11-19 22:19:43', '2021-11-19 22:19:48');
-INSERT INTO `borrow` VALUES (39, 14, 1, '2021-11-19 22:46:14', '2021-11-19 22:46:18');
-INSERT INTO `borrow` VALUES (40, 14, 1, '2021-11-19 22:57:21', '2021-11-19 22:57:26');
+INSERT INTO `borrow` VALUES (26, 11, 2, '2021-11-18 14:24:06', '2021-11-18 16:07:03', DATE_ADD('2021-11-18 14:24:06', INTERVAL 30 DAY), 0);
+INSERT INTO `borrow` VALUES (27, 11, 1, '2021-11-18 15:01:31', '2021-11-18 16:07:06', DATE_ADD('2021-11-18 15:01:31', INTERVAL 30 DAY), 0);
+INSERT INTO `borrow` VALUES (28, 11, 4, '2021-11-18 15:22:05', '2021-11-18 16:07:08', DATE_ADD('2021-11-18 15:22:05', INTERVAL 30 DAY), 0);
+INSERT INTO `borrow` VALUES (30, 14, 2, '2021-11-18 16:52:05', '2021-11-19 20:55:10', DATE_ADD('2021-11-18 16:52:05', INTERVAL 30 DAY), 0);
+INSERT INTO `borrow` VALUES (32, 14, 4, '2021-11-18 16:52:17', '2021-11-18 16:52:41', DATE_ADD('2021-11-18 16:52:17', INTERVAL 30 DAY), 0);
+INSERT INTO `borrow` VALUES (38, 14, 1, '2021-11-19 22:19:43', '2021-11-19 22:19:48', DATE_ADD('2021-11-19 22:19:43', INTERVAL 30 DAY), 0);
+INSERT INTO `borrow` VALUES (39, 14, 1, '2021-11-19 22:46:14', '2021-11-19 22:46:18', DATE_ADD('2021-11-19 22:46:14', INTERVAL 30 DAY), 0);
+INSERT INTO `borrow` VALUES (40, 14, 1, '2021-11-19 22:57:21', '2021-11-19 22:57:26', DATE_ADD('2021-11-19 22:57:21', INTERVAL 30 DAY), 0);
 
 -- ----------------------------
 -- Table structure for user

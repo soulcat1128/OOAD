@@ -9,9 +9,11 @@
     <result column="bookName" jdbcType="INTEGER" property="bookname" />
     <result column="borrowTime" jdbcType="TIMESTAMP" property="borrowtime" />
     <result column="returnTime" jdbcType="TIMESTAMP" property="returntime" />
+    <result column="expectedReturnTime" jdbcType="TIMESTAMP" property="expectedReturnTime" />
+    <result column="isExtended" jdbcType="TINYINT" property="isExtended" />
   </resultMap>
   <sql id="Base_Column_List">
-    borrowId, userId, bookId, borrowTime, returnTime
+    borrowId, userId, bookId, borrowTime, returnTime, expectedReturnTime, isExtended
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -25,9 +27,10 @@
   </delete>
   <insert id="insert" parameterType="com.bookmanager.bms.model.Borrow">
     insert into borrow (borrowId, userId, bookId, 
-      borrowTime, returnTime)
+      borrowTime, returnTime, expectedReturnTime, isExtended)
     values (#{borrowid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{bookid,jdbcType=INTEGER}, 
-      #{borrowtime,jdbcType=TIMESTAMP}, #{returntime,jdbcType=TIMESTAMP})
+      #{borrowtime,jdbcType=TIMESTAMP}, #{returntime,jdbcType=TIMESTAMP}, #{borrowtime,jdbcType=TIMESTAMP}
+    , 0)
   </insert>
   <insert id="insertSelective" parameterType="com.bookmanager.bms.model.Borrow">
     insert into borrow
@@ -47,6 +50,12 @@
       <if test="returntime != null">
         returnTime,
       </if>
+      <if test="expectedReturnTime != null">
+        expectedReturnTime,
+      </if>
+      <if test="isExtended != null">
+        isExtended,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="borrowid != null">
@@ -63,6 +72,12 @@
       </if>
       <if test="returntime != null">
         #{returntime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expectedReturnTime != null">
+        #{expectedReturnTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isExtended != null">
+        #{isExtended,jdbcType=TINYINT},
       </if>
     </trim>
   </insert>
@@ -81,6 +96,12 @@
       <if test="returntime != null">
         returnTime = #{returntime,jdbcType=TIMESTAMP},
       </if>
+      <if test="expectedReturnTime != null">
+        expectedReturnTime = #{expectedReturnTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isExtended != null">
+        isExtended = #{isExtended,jdbcType=TINYINT},
+      </if>
     </set>
     where borrowId = #{borrowid,jdbcType=INTEGER}
   </update>
@@ -89,11 +110,13 @@
     set userId = #{userid,jdbcType=INTEGER},
       bookId = #{bookid,jdbcType=INTEGER},
       borrowTime = #{borrowtime,jdbcType=TIMESTAMP},
-      returnTime = #{returntime,jdbcType=TIMESTAMP}
+      returnTime = #{returntime,jdbcType=TIMESTAMP},
+      expectedReturnTime = #{expectedReturnTime,jdbcType=TIMESTAMP},
+      isExtended = #{isExtended,jdbcType=TINYINT}
     where borrowId = #{borrowid,jdbcType=INTEGER}
   </update>
   <select id="selectAllByLimit" resultMap="BaseResultMap">
-    select borrowId, userId, bookId, borrowTime, returnTime,
+    select borrowId, userId, bookId, borrowTime, returnTime, expectedReturnTime, isExtended,
            (select userName from user where borrow.userId = user.userId) userName,
            (select bookName from book_info where borrow.bookId = book_info.bookId) bookName
     from borrow
@@ -117,7 +140,8 @@
     </if>
   </select>
   <select id="selectBySearch" resultMap="BaseResultMap">
-    select borrowId, borrow.userId, borrow.bookId, borrowTime, returnTime, userName, bookName
+    select borrowId, borrow.userId, borrow.bookId, borrowTime, returnTime, userName, bookName,
+           expectedReturnTime, isExtended
     from borrow, user, book_info
     where borrow.userId = user.userId and borrow.bookId = book_info.bookId
     <if test="username != null and username != '' ">
@@ -136,7 +160,7 @@
     where userId = #{userid}
   </select>
   <select id="selectAllByLimitByReader" resultMap="BaseResultMap">
-    select borrowId, userId, bookId, borrowTime, returnTime,
+    select borrowId, userId, bookId, borrowTime, returnTime, expectedReturnTime, isExtended,
            (select userName from user where borrow.userId = user.userId) userName,
            (select bookName from book_info where borrow.bookId = book_info.bookId) bookName
     from borrow

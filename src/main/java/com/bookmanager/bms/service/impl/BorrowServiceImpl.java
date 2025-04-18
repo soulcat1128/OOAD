@@ -46,6 +46,21 @@ public class BorrowServiceImpl implements BorrowService {
         try {
             borrow.setBorrowtime(simpleDateFormat.parse(borrow.getBorrowtimestr()));
             borrow.setReturntime(simpleDateFormat.parse(borrow.getReturntimestr()));
+
+            // 新增：設定預期歸還時間（如果為null）
+            if (borrow.getExpectedReturnTime() == null) {
+                // 預設為借閱時間 + 30天
+                java.util.Calendar calendar = java.util.Calendar.getInstance();
+                calendar.setTime(borrow.getBorrowtime());
+                calendar.add(java.util.Calendar.DAY_OF_MONTH, 30);
+                borrow.setExpectedReturnTime(calendar.getTime());
+            }
+
+            // 新增：設定是否延長借閱（如果為null）
+            if (borrow.getIsExtended() == null) {
+                borrow.setIsExtended(0); // 0表示未延長
+            }
+
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -55,6 +70,20 @@ public class BorrowServiceImpl implements BorrowService {
     // 不会调整时间格式的add
     @Override
     public Integer addBorrow2(Borrow borrow) {
+        // 新增：設定預期歸還時間（如果為null）
+        if (borrow.getExpectedReturnTime() == null) {
+            // 預設為借閱時間 + 30天
+            java.util.Calendar calendar = java.util.Calendar.getInstance();
+            calendar.setTime(borrow.getBorrowtime());
+            calendar.add(java.util.Calendar.DAY_OF_MONTH, 30);
+            borrow.setExpectedReturnTime(calendar.getTime());
+        }
+
+        // 新增：設定是否延長借閱（如果為null）
+        if (borrow.getIsExtended() == null) {
+            borrow.setIsExtended(0); // 0表示未延長
+        }
+
         return borrowMapper.insertSelective(borrow);
     }
 
