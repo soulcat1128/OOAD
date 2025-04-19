@@ -17,19 +17,19 @@ public class BookTypeController {
     @Autowired
     BookTypeService bookTypeService;
 
-    // 获得数量
+    // 獲得數量
     @GetMapping(value = "/getCount")
     public Integer getCount(){
         return bookTypeService.getCount();
     }
 
-    // 查询所有类型
+    // 查詢所有類型
     @GetMapping(value = {"/queryBookTypes", "/reader/queryBookTypes"})
     public List<BookType> queryBookTypes(){
         return bookTypeService.queryBookTypes();
     }
 
-    // 分页查询图书类型 params: {page, limit, booktypename}
+    // 分頁查詢圖書類型 params: {page, limit, booktypename}
     @GetMapping(value = "/queryBookTypesByPage")
     public Map<String, Object> queryBookTypesByPage(@RequestParam Map<String, Object> params){
         MyUtils.parsePageParams(params);
@@ -38,25 +38,25 @@ public class BookTypeController {
         return MyResult.getListResultMap(0, "success", count, bookTypes);
     }
 
-    // 添加类型
+    // 添加類型
     @PostMapping(value = "/addBookType")
     public Integer addBookType(@RequestBody BookType bookType){
         return bookTypeService.addBookType(bookType);
     }
 
-    // 删除类型
+    // 刪除類型
     @DeleteMapping(value = "/deleteBookType")
     public Integer deleteBookType(@RequestBody BookType bookType){
         return bookTypeService.deleteBookType(bookType);
     }
 
-    // 删除一些类型
+    // 刪除一些類型
     @DeleteMapping(value = "/deleteBookTypes")
     public Integer deleteBookTypes(@RequestBody List<BookType> bookTypes){
         return bookTypeService.deleteBookTypes(bookTypes);
     }
 
-    // 更新类型
+    // 更新類型
     @PutMapping(value = "/updateBookType")
     public Integer updateBookType(@RequestBody BookType bookType){
         return bookTypeService.updateBookType(bookType);

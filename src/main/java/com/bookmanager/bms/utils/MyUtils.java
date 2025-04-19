@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class MyUtils {
 
-    // 给map加上begin和size，方便处理分页
+    // 給map加上begin和size，方便處理分頁
     public static void parsePageParams(Map<String, Object> params) {
         int page = Integer.parseInt((String) params.get("page"));
         int size = Integer.parseInt((String) params.get("limit"));

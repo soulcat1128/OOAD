@@ -28,15 +28,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(String token, User user) {
-        // 设置redisTemplate对象key的序列化方式
+        // 設置redisTemplate對象key的序列化方式
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        // key是token，value是用户保存到redis中，超时时间1小时
+        // key是token，value是用戶保存到redis中，超時時間1小時
         redisTemplate.opsForValue().set(token, user, 1, TimeUnit.HOURS);
     }
 
     @Override
     public User getUser(String token) {
-        // 根据token得到user
+        // 根據token得到user
         return (User) redisTemplate.opsForValue().get(token);
     }
 
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Integer register(String username, String password) {
         User tmp = userMapper.selectByUsername(username);
-        if(tmp != null) return 0;  //账号重复
+        if(tmp != null) return 0;  //帳號重複
 
         User user = new User();
         user.setUsername(username);
