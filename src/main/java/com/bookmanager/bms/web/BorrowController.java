@@ -4,8 +4,10 @@ import com.bookmanager.bms.exception.NotEnoughException;
 import com.bookmanager.bms.exception.OperationFailureException;
 import com.bookmanager.bms.model.BookInfo;
 import com.bookmanager.bms.model.Borrow;
+import com.bookmanager.bms.model.SuspensionRecord;
 import com.bookmanager.bms.service.BookInfoService;
 import com.bookmanager.bms.service.BorrowService;
+import com.bookmanager.bms.service.SuspensionService;
 import com.bookmanager.bms.utils.MyResult;
 import com.bookmanager.bms.utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ public class BorrowController {
     BorrowService borrowService;
     @Autowired
     BookInfoService bookInfoService;
+    @Autowired
+    SuspensionService suspensionService;
 
     // 分頁查詢借閱 params: {page, limit, userid, bookid}
     @RequestMapping(value = "/queryBorrowsByPage")
@@ -73,15 +77,20 @@ public class BorrowController {
     // 借書
     @RequestMapping(value = {"/borrowBook", "/reader/borrowBook"})
     @Transactional
-    public Integer borrowBook(Integer userid, Integer bookid){
+    public Map<String, Object> borrowBook(Integer userid, Integer bookid){
         try{
+            // 檢查使用者借閱權限
+            if(suspensionService.canUserBorrow(userid) == false)
+            {
+                return MyResult.getResultMap(1, "使用者已被停權，無法借閱圖書");
+            }
             // 查詢該書的情況
             BookInfo theBook = bookInfoService.queryBookInfoById(bookid);
 
             if(theBook == null) {  // 圖書不存在
-                throw new NullPointerException("圖書" + bookid + "不存在");
+                return MyResult.getResultMap(2, "圖書" + bookid + "不存在");
             } else if(theBook.getIsborrowed() == 1) {  // 已經被借
-                throw new NotEnoughException("圖書" + bookid + "庫存不足（已經被借走）");
+                return MyResult.getResultMap(3, "圖書" + bookid + "庫存不足（已經被借走）");  // TODO : 之後改預約
             }
 
             // 更新圖書表的isBorrowed
@@ -89,7 +98,7 @@ public class BorrowController {
             bookInfo.setBookid(bookid);
             bookInfo.setIsborrowed((byte) 1);
             Integer res2 = bookInfoService.updateBookInfo(bookInfo);
-            if(res2 == 0) throw new OperationFailureException("圖書" + bookid + "更新被借資訊失敗");
+            if(res2 == 0) return MyResult.getResultMap(4, "圖書" + bookid + "更新被借資訊失敗");
 
             // 添加一條紀錄到borrow表
             Borrow borrow = new Borrow();
@@ -97,15 +106,15 @@ public class BorrowController {
             borrow.setBookid(bookid);
             borrow.setBorrowtime(new Date(System.currentTimeMillis()));
             Integer res1 = borrowService.addBorrow2(borrow);
-            if(res1 == 0) throw new OperationFailureException("圖書" + bookid + "添加借閱記錄失敗");
+            if(res1 == 0) return MyResult.getResultMap(5, "圖書" + bookid + "添加借閱記錄失敗");
 
+            return MyResult.getResultMap(0, "借閱成功");
         } catch (Exception e) {
             System.out.println("發生異常，進行手動回滾");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             e.printStackTrace();
-            return 0;
+            return MyResult.getResultMap(6, e.getMessage());
         }
-        return 1;
     }
 
     // 還書
@@ -149,30 +158,35 @@ public class BorrowController {
         return 1;
     }
 
+    // 延長借閱
     @RequestMapping(value = {"/extendBorrow", "/reader/extendBorrow"})
     @Transactional
     public Map<String, Object> extendBorrow(Integer borrowid, Integer bookid) {
         try {
             // 查詢借書的情況
             Borrow theBorrow = borrowService.queryBorrowsById(borrowid);
-
+            Integer theBorrowUserId = theBorrow.getUserid();
+            if(suspensionService.canUserBorrow(theBorrowUserId) == false)
+            {
+                return MyResult.getResultMap(1, "使用者已被停權，無法延長借閱時間");
+            }
             if (theBorrow == null) {
-                return MyResult.getResultMap(1, "借閱記錄不存在");
+                return MyResult.getResultMap(2, "借閱記錄不存在");
             }
 
             if (theBorrow.getReturntime() != null) {
-                return MyResult.getResultMap(2, "該書籍已歸還，無法延長借閱");
+                return MyResult.getResultMap(3, "該書籍已歸還，無法延長借閱");
             }
 
             if (theBorrow.getIsExtended() != null && theBorrow.getIsExtended() == 1) {
-                return MyResult.getResultMap(3, "該借閱已經延長過，每次借閱只能延長一次");
+                return MyResult.getResultMap(4, "該借閱已經延長過，每次借閱只能延長一次");
             }
 
             // 檢查是否已逾期
             Date now = new Date();
 
             if (now.after(theBorrow.getExpectedReturnTime())) {
-                return MyResult.getResultMap(4, "該借閱已超過原借閱期限，故無法延長");
+                return MyResult.getResultMap(5, "該借閱已超過原借閱期限，故無法延長");
             }
 
             // 設置isExtended為1，並延長借閱期限 14 天
@@ -186,7 +200,7 @@ public class BorrowController {
             Integer res = borrowService.updateBorrow2(theBorrow);
 
             if (res == 0) {
-                return MyResult.getResultMap(5, "延長借閱失敗，系統錯誤");
+                return MyResult.getResultMap(6, "延長借閱失敗，系統錯誤");
             }
 
             // 成功延長，返回新的到期日期
@@ -197,7 +211,7 @@ public class BorrowController {
             System.out.println("發生異常，進行手動回滾");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             e.printStackTrace();
-            return MyResult.getResultMap(1, "系統錯誤: " + e.getMessage());
+            return MyResult.getResultMap(1, e.getMessage());
         }
     }
 

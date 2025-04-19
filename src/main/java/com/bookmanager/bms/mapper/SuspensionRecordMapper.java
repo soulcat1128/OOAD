@@ -14,4 +14,6 @@ public interface SuspensionRecordMapper {
     int updateByPrimaryKeySelective(SuspensionRecord record);
 
     int updateByPrimaryKey(SuspensionRecord record);
+
+    SuspensionRecord checkUserBorrowingSuspension(Integer userId);
 }
