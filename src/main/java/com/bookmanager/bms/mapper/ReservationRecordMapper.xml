@@ -92,7 +92,7 @@
             </if>
         </where>
     </select>
-    <select id="selectBySearch" resultMap="BaseResultMap">
+    <select id="selectBySearch" resultType="map">
         SELECT rr.reservationId, rr.userId, rr.bookId, rr.status,
         u.userName, b.bookName
         FROM reservation_record rr
@@ -101,6 +101,9 @@
         <where>
             <if test="username != null and username != ''">
                 AND u.userName LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="bookname != null and bookname != '' ">
+                and bookName like concat('%',#{bookname},'%')
             </if>
             <if test="userid != null and userid != ''">
                 AND rr.userId = #{userid}

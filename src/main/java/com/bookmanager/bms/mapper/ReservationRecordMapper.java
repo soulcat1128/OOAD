@@ -26,5 +26,5 @@ public interface ReservationRecordMapper {
 
     Integer selectCountBySearch(Map<String, Object> params);
 
-    List<ReservationRecord> selectBySearch(Map<String, Object> params);
+    List<Map<String, Object>> selectBySearch(Map<String, Object> params);
 }

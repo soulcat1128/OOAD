@@ -78,8 +78,8 @@ public class ReservationRecordController {
     }
 
     @DeleteMapping(value = "/cancelReservationRecord")
-    public Integer deleteReservationRecord(Integer id) {
-        return reservationRecordService.deleteReservationRecord(id);
+    public Integer deleteReservationRecord(Integer reservationId) {
+        return reservationRecordService.deleteReservationRecord(reservationId);
     }
 
     @GetMapping(value = "/getReservationRecordsByUserId")
@@ -91,7 +91,7 @@ public class ReservationRecordController {
     public Map<String, Object> queryReservationRecordByPage(@RequestParam Map<String, Object> params) {
         MyUtils.parsePageParams(params);
         int count = reservationRecordService.getSearchCount(params);
-        List<ReservationRecord> reservationRecords = reservationRecordService.searchReservationRecordsByPage(params);
+        List<Map<String, Object>> reservationRecords = reservationRecordService.searchReservationRecordsByPage(params);
         return MyResult.getListResultMap(0, "success", count, reservationRecords);
     }
 }

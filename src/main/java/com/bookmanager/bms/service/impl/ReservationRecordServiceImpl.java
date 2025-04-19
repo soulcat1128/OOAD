@@ -31,8 +31,8 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
     }
 
     @Override
-    public Integer deleteReservationRecord(Integer id) {
-        return reservationRecordMapper.deleteByPrimaryKey(id);
+    public Integer deleteReservationRecord(Integer reservationid) {
+        return reservationRecordMapper.deleteByPrimaryKey(reservationid);
     }
 
     @Override
@@ -83,7 +83,8 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
     }
 
     @Override
-    public List<ReservationRecord> searchReservationRecordsByPage(Map<String, Object> params) {
+    public List<Map<String, Object>> searchReservationRecordsByPage(Map<String, Object> params) {
+        List<Map<String, Object>> reservationRecords = reservationRecordMapper.selectBySearch(params);
         return reservationRecordMapper.selectBySearch(params);
     }
 }

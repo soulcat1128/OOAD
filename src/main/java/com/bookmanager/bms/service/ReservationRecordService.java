@@ -12,7 +12,7 @@ public interface ReservationRecordService {
 
     Integer updateReservationRecord(ReservationRecord reservationRecord);
 
-    Integer deleteReservationRecord(Integer id);
+    Integer deleteReservationRecord(Integer reservationid);
 
     Integer searchStatusByUserIdAndBookId(Integer userId, Integer bookId);
 
@@ -24,5 +24,5 @@ public interface ReservationRecordService {
 
     int getSearchCount(Map<String, Object> map);
 
-    List<ReservationRecord> searchReservationRecordsByPage(Map<String, Object> params);
+    List<Map<String, Object>> searchReservationRecordsByPage(Map<String, Object> params);
 }
