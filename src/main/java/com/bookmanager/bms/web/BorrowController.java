@@ -6,6 +6,7 @@ import com.bookmanager.bms.model.BookInfo;
 import com.bookmanager.bms.model.Borrow;
 import com.bookmanager.bms.service.BookInfoService;
 import com.bookmanager.bms.service.BorrowService;
+import com.bookmanager.bms.service.ReservationRecordService;
 import com.bookmanager.bms.utils.MyResult;
 import com.bookmanager.bms.utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public class BorrowController {
     BorrowService borrowService;
     @Autowired
     BookInfoService bookInfoService;
+    @Autowired
+    ReservationRecordService reservationRecordService;
 
     // 分頁查詢借閱 params: {page, limit, userid, bookid}
     @RequestMapping(value = "/queryBorrowsByPage")
@@ -118,6 +121,7 @@ public class BorrowController {
             // 查詢借書的情況
             Borrow theBorrow = borrowService.queryBorrowsById(borrowid);
 
+
             if(theBook == null) {  // 圖書不存在
                 throw new NullPointerException("圖書" + bookid + "不存在");
             } else if(theBorrow == null) {   //結束記錄不存在
@@ -139,6 +143,14 @@ public class BorrowController {
             borrow.setReturntime(new Date(System.currentTimeMillis()));
             Integer res1 = borrowService.updateBorrow2(borrow);
             if(res1 == 0) throw new OperationFailureException("圖書" + bookid + "更新借閱記錄失敗");
+
+            Integer resp = reservationRecordService.updateStatusByReservationList(bookid);
+            if (resp != 0) {
+                Integer res3 = this.borrowBook(resp, bookid);
+                if (res3 == 0) {
+                    throw new OperationFailureException("圖書" + bookid + "借閱失敗");
+                }
+            }
 
         } catch (Exception e) {
             System.out.println("發生異常，進行手動回滾");
