@@ -12,8 +12,8 @@ import java.util.Map;
 public class JsonUtil {
     static ObjectMapper objectMapper = new ObjectMapper();
     static {
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);// 允许pojo中有在json串中不存在的字段
-        objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);// 允许有注释
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);// 允許pojo中有在json串中不存在的欄位
+        objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);// 允許有注釋
     }
 
     public static <T>T parseObject(InputStream inputStream, Class<T> tClass)  {

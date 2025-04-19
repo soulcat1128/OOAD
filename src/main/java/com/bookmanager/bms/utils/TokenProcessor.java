@@ -1,6 +1,6 @@
 package com.bookmanager.bms.utils;
 /**
- * 生成Token的工具类：  
+ * 生成Token的工具類：
  */
 
 import java.security.MessageDigest;
@@ -10,7 +10,7 @@ import java.util.Random;
 import sun.misc.BASE64Encoder;
 
 /**
- * 生成Token的工具类  
+ * 生成Token的工具類
  *
  */
 public class TokenProcessor {

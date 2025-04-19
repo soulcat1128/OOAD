@@ -30,7 +30,7 @@ public class BorrowServiceImpl implements BorrowService {
     @Override
     public List<Borrow> searchBorrowsByPage(Map<String, Object> params) {
         List<Borrow> borrows = borrowMapper.selectBySearch(params);
-        // 添加string类型的时间显示
+        // 添加string類型的時間顯示
         for(Borrow borrow : borrows) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if(borrow.getBorrowtime() != null) borrow.setBorrowtimestr(simpleDateFormat.format(borrow.getBorrowtime()));
@@ -42,7 +42,7 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     public Integer addBorrow(Borrow borrow) {
-        // 将string类型的时间重新调整
+        // 將string類型的時間重新調整
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
             borrow.setBorrowtime(simpleDateFormat.parse(borrow.getBorrowtimestr()));
@@ -68,7 +68,7 @@ public class BorrowServiceImpl implements BorrowService {
         return borrowMapper.insertSelective(borrow);
     }
 
-    // 不会调整时间格式的add
+    // 不會調整時間格式的add
     @Override
     public Integer addBorrow2(Borrow borrow) {
         // 新增：設定預期歸還時間（如果為null）
@@ -90,7 +90,7 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     public Integer deleteBorrow(Borrow borrow) {
-        // 先查询有没有还书
+        // 先查詢有沒有還書
         Borrow borrow1 = borrowMapper.selectByPrimaryKey(borrow.getBorrowid());
         if(borrow1.getReturntime() == null) return 0;
         return borrowMapper.deleteByPrimaryKey(borrow.getBorrowid());
@@ -107,7 +107,7 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     public Integer updateBorrow(Borrow borrow) {
-        // 将string类型的时间重新调整
+        // 將string類型的時間重新調整
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
             borrow.setBorrowtime(simpleDateFormat.parse(borrow.getBorrowtimestr()));
@@ -119,7 +119,7 @@ public class BorrowServiceImpl implements BorrowService {
         return borrowMapper.updateByPrimaryKeySelective(borrow);
     }
 
-    // 不调整时间格式的更新
+    // 不調整時間格式的更新
     @Override
     public Integer updateBorrow2(Borrow borrow) {
         return borrowMapper.updateByPrimaryKeySelective(borrow);

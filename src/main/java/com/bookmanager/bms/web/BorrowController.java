@@ -31,7 +31,7 @@ public class BorrowController {
     @Autowired
     BookInfoService bookInfoService;
 
-    // 分页查询借阅 params: {page, limit, userid, bookid}
+    // 分頁查詢借閱 params: {page, limit, userid, bookid}
     @RequestMapping(value = "/queryBorrowsByPage")
     public Map<String, Object> queryBorrowsByPage(@RequestParam Map<String, Object> params){
         MyUtils.parsePageParams(params);
@@ -40,67 +40,67 @@ public class BorrowController {
         return MyResult.getListResultMap(0, "success", count, borrows);
     }
 
-    // 添加借阅
+    // 添加借閱
     @RequestMapping(value = "/addBorrow")
     public Integer addBorrow(@RequestBody Borrow borrow){
         return borrowService.addBorrow(borrow);
     }
 
-    // 获得数量
+    // 獲得數量
     @RequestMapping(value = "/getCount")
     public Integer getCount(){
         return borrowService.getCount();
     }
 
-    // 删除借阅
+    // 刪除借閱
     @RequestMapping(value = "/deleteBorrow")
     public Integer deleteBorrow(@RequestBody Borrow borrow){
         return borrowService.deleteBorrow(borrow);
     }
 
-    // 删除一些借阅
+    // 刪除一些借閱
     @RequestMapping(value = "/deleteBorrows")
     public Integer deleteBorrows(@RequestBody List<Borrow> borrows){
         return borrowService.deleteBorrows(borrows);
     }
 
-    // 更新借阅
+    // 更新借閱
     @RequestMapping(value = "/updateBorrow")
     public Integer updateBorrow(@RequestBody Borrow borrow){
         return borrowService.updateBorrow(borrow);
     }
 
-    // 借书
+    // 借書
     @RequestMapping(value = {"/borrowBook", "/reader/borrowBook"})
     @Transactional
     public Integer borrowBook(Integer userid, Integer bookid){
         try{
-            // 查询该书的情况
+            // 查詢該書的情況
             BookInfo theBook = bookInfoService.queryBookInfoById(bookid);
 
-            if(theBook == null) {  // 图书不存在
-                throw new NullPointerException("图书" + bookid + "不存在");
-            } else if(theBook.getIsborrowed() == 1) {  // 已经被借
-                throw new NotEnoughException("图书" + bookid + "库存不足（已经被借走）");
+            if(theBook == null) {  // 圖書不存在
+                throw new NullPointerException("圖書" + bookid + "不存在");
+            } else if(theBook.getIsborrowed() == 1) {  // 已經被借
+                throw new NotEnoughException("圖書" + bookid + "庫存不足（已經被借走）");
             }
 
-            // 更新图书表的isBorrowed
+            // 更新圖書表的isBorrowed
             BookInfo bookInfo = new BookInfo();
             bookInfo.setBookid(bookid);
             bookInfo.setIsborrowed((byte) 1);
             Integer res2 = bookInfoService.updateBookInfo(bookInfo);
-            if(res2 == 0) throw new OperationFailureException("图书" + bookid + "更新被借信息失败");
+            if(res2 == 0) throw new OperationFailureException("圖書" + bookid + "更新被借資訊失敗");
 
-            // 添加一条记录到borrow表
+            // 添加一條紀錄到borrow表
             Borrow borrow = new Borrow();
             borrow.setUserid(userid);
             borrow.setBookid(bookid);
             borrow.setBorrowtime(new Date(System.currentTimeMillis()));
             Integer res1 = borrowService.addBorrow2(borrow);
-            if(res1 == 0) throw new OperationFailureException("图书" + bookid + "添加借阅记录失败");
+            if(res1 == 0) throw new OperationFailureException("圖書" + bookid + "添加借閱記錄失敗");
 
         } catch (Exception e) {
-            System.out.println("发生异常，进行手动回滚");
+            System.out.println("發生異常，進行手動回滾");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             e.printStackTrace();
             return 0;
@@ -108,40 +108,40 @@ public class BorrowController {
         return 1;
     }
 
-    // 还书
+    // 還書
     @RequestMapping(value = {"/returnBook", "/reader/returnBook"})
     @Transactional
     public Integer returnBook(Integer borrowid, Integer bookid){
         try {
-            // 查询该书的情况
+            // 查詢該書的情況
             BookInfo theBook = bookInfoService.queryBookInfoById(bookid);
-            // 查询借书的情况
+            // 查詢借書的情況
             Borrow theBorrow = borrowService.queryBorrowsById(borrowid);
 
-            if(theBook == null) {  // 图书不存在
-                throw new NullPointerException("图书" + bookid + "不存在");
-            } else if(theBorrow == null) {   //结束记录不存在
-                throw new NullPointerException("借书记录" + bookid + "不存在");
-            } else if(theBorrow.getReturntime() != null) {  // 已经还过书
-                throw new NotEnoughException("图书" + bookid + "已经还过了");
+            if(theBook == null) {  // 圖書不存在
+                throw new NullPointerException("圖書" + bookid + "不存在");
+            } else if(theBorrow == null) {   //結束記錄不存在
+                throw new NullPointerException("借書記錄" + bookid + "不存在");
+            } else if(theBorrow.getReturntime() != null) {  // 已經還過書
+                throw new NotEnoughException("圖書" + bookid + "已經還過了");
             }
 
-            // 更新图书表的isBorrowed
+            // 更新圖書表的isBorrowed
             BookInfo bookInfo = new BookInfo();
             bookInfo.setBookid(bookid);
             bookInfo.setIsborrowed((byte) 0);
             Integer res2 = bookInfoService.updateBookInfo(bookInfo);
-            if(res2 == 0) throw new OperationFailureException("图书" + bookid + "更新被借信息失败");
+            if(res2 == 0) throw new OperationFailureException("圖書" + bookid + "更新被借資訊失敗");
 
-            // 更新Borrow表，更新结束时间
+            // 更新Borrow表，更新結束時間
             Borrow borrow = new Borrow();
             borrow.setBorrowid(borrowid);
             borrow.setReturntime(new Date(System.currentTimeMillis()));
             Integer res1 = borrowService.updateBorrow2(borrow);
-            if(res1 == 0) throw new OperationFailureException("图书" + bookid + "更新借阅记录失败");
+            if(res1 == 0) throw new OperationFailureException("圖書" + bookid + "更新借閱記錄失敗");
 
         } catch (Exception e) {
-            System.out.println("发生异常，进行手动回滚");
+            System.out.println("發生異常，進行手動回滾");
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             e.printStackTrace();
             return 0;

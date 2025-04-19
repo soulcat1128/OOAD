@@ -21,39 +21,39 @@ import java.util.Map;
 public class UpdateController {
 
     /**
-     * 我的上传方法
+     * 我的上傳方法
      * @param req
      * @param dirName
      * @return
      */
     private String myUpdate(HttpServletRequest req, String dirName) {
-        String res = null;  // 返回网络路径
+        String res = null;  // 返回網路路徑
         try {
-            String staticDir = ResourceUtils.getURL("classpath:").getPath() + "static";  // 得到classes/static目录
-            String localDir = staticDir + "/" + dirName;   //本地目录
-            // 如果结果目录不存在，则创建目录
+            String staticDir = ResourceUtils.getURL("classpath:").getPath() + "static";  // 得到classes/static目錄
+            String localDir = staticDir + "/" + dirName;   //本地目錄
+            // 如果結果目錄不存在，則創建目錄
             File resDirFile = new File(localDir);
             if(!resDirFile.exists()) {
                 boolean flag = resDirFile.mkdirs();
-                if(!flag) throw new RuntimeException("创建结果目录失败");
+                if(!flag) throw new RuntimeException("創建結果目錄失敗");
             }
-            //先判断上传的数据是否多段数据（只有是多段的数据，才是文件上传的）
+            //先判斷上傳的數據是否多段數據（只有是多段的數據，才是文件上傳的）
             if (ServletFileUpload.isMultipartContent(req)) {
-                // 创建 FileItemFactory 工厂实现类
+                // 創建 FileItemFactory 工廠實現類
                 FileItemFactory fileItemFactory = new DiskFileItemFactory();
-                // 创建用于解析上传数据的工具类 ServletFileUpload 类
+                // 創建用於解析上傳數據的工具類 ServletFileUpload 類
                 ServletFileUpload servletFileUpload = new ServletFileUpload(fileItemFactory);
-                // 解析上传的数据，得到每一个表单项 FileItem
+                // 解析上傳的數據，得到每一個表單項 FileItem
                 List<FileItem> list = servletFileUpload.parseRequest(new ServletRequestContext(req));
-                // 循环判断，每一个表单项，是普通类型，还是上传的文件
+                // 循環判斷，每一個表單項，是普通類型，還是上傳的文件
                 for (FileItem fileItem : list) {
-                    if ( !fileItem.isFormField()) { // 是上传的文件
-                        // 上传的文件
-                        System.out.println("表单项的 name 属性值：" + fileItem.getFieldName());
-                        System.out.println("上传的文件名：" + fileItem.getName());
-                        // 加个时间戳防止重名
+                    if ( !fileItem.isFormField()) { // 是上傳的文件
+                        // 上傳的文件
+                        System.out.println("表單項的 name 屬性值：" + fileItem.getFieldName());
+                        System.out.println("上傳的檔案名：" + fileItem.getName());
+                        // 加個時間戳防止重名
                         String newFileName = System.currentTimeMillis() + fileItem.getName();
-                        // 写文件
+                        // 寫文件
                         File file = new File(localDir + "/" + newFileName);
                         fileItem.write(file);
                         // 返回值
@@ -69,7 +69,7 @@ public class UpdateController {
     }
 
     /**
-     * 上传图片
+     * 上傳圖片
      * @param req
      * @return
      */

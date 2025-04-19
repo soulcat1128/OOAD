@@ -6,16 +6,16 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-// 用户拦截器，拦截未登录不能访问的请求
+// 用戶攔截器，攔截未登錄不能訪問的請求
 public class UserInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         User user = (User) request.getSession().getAttribute("userObj");
 
-        if(user == null) {  //没有登录
-            System.out.println("没有登录!不能访问!");
-            // 重定向到登录界面
+        if(user == null) {  //沒有登錄
+            System.out.println("沒有登錄!不能訪問!");
+            // 重定向到登錄界面
             response.sendRedirect(request.getContextPath() + "/index.html");
             return false;
         }
