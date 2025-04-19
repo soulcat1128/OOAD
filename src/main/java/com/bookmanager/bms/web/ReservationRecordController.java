@@ -72,9 +72,9 @@ public class ReservationRecordController {
         return reservationRecordService.getReservationRecord(id);
     }
 
-    @PutMapping(value = "/updateReservationRecord")
-    public Integer updateReservationRecord(ReservationRecord reservationRecord) {
-        return reservationRecordService.updateReservationRecord(reservationRecord);
+    @PutMapping(value = "/updateStatusByReservationList")
+    public Integer updateReservationRecord(Integer bookid) {
+        return reservationRecordService.updateStatusByReservationList(bookid);
     }
 
     @DeleteMapping(value = "/cancelReservationRecord")

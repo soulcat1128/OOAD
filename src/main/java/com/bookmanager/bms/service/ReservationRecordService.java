@@ -10,7 +10,7 @@ public interface ReservationRecordService {
 
     ReservationRecord getReservationRecord(Integer id);
 
-    Integer updateReservationRecord(ReservationRecord reservationRecord);
+    Integer updateReservationRecord(Integer bookid);
 
     Integer deleteReservationRecord(Integer reservationid);
 
@@ -18,7 +18,7 @@ public interface ReservationRecordService {
 
     Integer setStatusById(Integer id, Integer status);
 
-    Integer updateStatusByReservationList(List<ReservationRecord> reservationRecords);
+    Integer updateStatusByReservationList(Integer bookid);
 
     List<ReservationRecord> getReservationRecordsByUserId(Integer userId);
 

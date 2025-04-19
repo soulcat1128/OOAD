@@ -20,7 +20,7 @@ public interface ReservationRecordMapper {
 
     List<ReservationRecord> selectByUserId(Integer reservationId);
 
-    List<ReservationRecord> selectByBookId(Integer reservationId);
+    List<ReservationRecord> selectByBookId(Integer bookid);
 
     List<ReservationRecord> selectByBookIdAndUserId(Integer bookId, Integer userId);
 
