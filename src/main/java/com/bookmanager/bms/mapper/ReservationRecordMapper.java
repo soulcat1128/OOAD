@@ -1,6 +1,7 @@
 package com.bookmanager.bms.mapper;
 
 import com.bookmanager.bms.model.ReservationRecord;
+import com.bookmanager.bms.model.SuspensionRecord;
 
 import java.util.List;
 import java.util.Map;
@@ -27,4 +28,6 @@ public interface ReservationRecordMapper {
     Integer selectCountBySearch(Map<String, Object> params);
 
     List<Map<String, Object>> selectBySearch(Map<String, Object> params);
+
+    SuspensionRecord getCurrentUserSuspension(Integer userId);
 }

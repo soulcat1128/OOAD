@@ -202,3 +202,24 @@ create index `fk_suspension_borrow_1`
 
 create index `fk_suspension_user_1`
     on `suspension_record` (`userId`);
+
+
+-- ----------------------------
+-- Table structure for appeal
+-- ----------------------------
+DROP TABLE IF EXISTS `appeal`;
+CREATE TABLE `appeal` (
+    `appealId` int(11) NOT NULL AUTO_INCREMENT,
+    `userId` int(11) NOT NULL,
+    `suspensionId` int(11) DEFAULT NULL,
+    `createTime` datetime NOT NULL,
+    `status` tinyint(4) NOT NULL COMMENT '0: 待處理, 1: 已批准, 2: 已拒絕',
+    `appealContent` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+    `adminReply` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+    `replyTime` datetime DEFAULT NULL,
+    PRIMARY KEY (`appealId`) USING BTREE,
+    INDEX `fk_appeal_user_1`(`userId`) USING BTREE,
+    INDEX `fk_appeal_suspension_1`(`suspensionId`) USING BTREE,
+    CONSTRAINT `appeal_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`userId`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT `appeal_ibfk_2` FOREIGN KEY (`suspensionId`) REFERENCES `suspension_record` (`suspensionId`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;

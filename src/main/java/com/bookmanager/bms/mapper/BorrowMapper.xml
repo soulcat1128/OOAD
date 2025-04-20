@@ -167,4 +167,11 @@
     where userId = #{userid}
     limit #{begin}, #{size}
   </select>
+  <select id="findOverdueBooks" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from borrow
+    where returnTime is null
+    and expectedReturnTime &lt; NOW()
+  </select>
 </mapper>

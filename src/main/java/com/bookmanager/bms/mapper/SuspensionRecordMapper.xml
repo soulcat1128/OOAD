@@ -79,4 +79,40 @@
             borrowingPermission = #{borrowingPermission, jdbcType=TINYINT}
         WHERE suspensionId = #{suspensionid, jdbcType=INTEGER}
     </update>
+    <select id="checkUserBorrowingSuspension" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM suspension_record
+        WHERE userId = #{userId, jdbcType=INTEGER}
+        AND borrowingPermission = 0
+        LIMIT 1
+    </select>
+    <select id="findExpiredSuspensions" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM suspension_record
+        WHERE endDate &lt; NOW() 
+        AND borrowingPermission = 0
+    </select>
+    <select id="findByUserIdAndBorrowId" parameterType="map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM suspension_record
+        WHERE userId = #{userId, jdbcType=INTEGER}
+        AND borrowId = #{borrowId, jdbcType=INTEGER}
+    </select>
+    <update id="removeSuspensionByUserId" parameterType="com.bookmanager.bms.model.SuspensionRecord">
+        UPDATE suspension_record
+        SET borrowingPermission = 1
+        WHERE userId = #{userId, jdbcType=INTEGER}
+    </update>
+    <select id="findLastActiveSuspensionByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM suspension_record
+        WHERE userId = #{userId, jdbcType=INTEGER}
+        AND borrowingPermission = 0
+        ORDER BY endDate DESC
+        LIMIT 1
+    </select>
 </mapper>
