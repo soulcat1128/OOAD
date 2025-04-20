@@ -41,7 +41,7 @@ public class ReservationRecordController {
                 throw new Exception(theBook.getBookname() + " 已經預約過了，無法再次預約");
             }
 
-            // 檢查用戶是否有未還的書籍 !!
+            // 檢查用戶書籍是否已借閱 !!
 
             ReservationRecord reservationRecord = new ReservationRecord();
             reservationRecord.setUserid(userid);
