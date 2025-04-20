@@ -5,6 +5,7 @@ import com.bookmanager.bms.model.ReservationRecord;
 import com.bookmanager.bms.service.BookInfoService;
 import com.bookmanager.bms.service.BorrowService;
 import com.bookmanager.bms.service.ReservationRecordService;
+import com.bookmanager.bms.service.SuspensionService;
 import com.bookmanager.bms.utils.MyResult;
 import com.bookmanager.bms.utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class ReservationRecordController {
     BookInfoService bookInfoService;
     @Autowired
     BorrowService borrowService;
+    @Autowired
+    SuspensionService suspensionService;
 
     // 預約書籍
     @PostMapping(value = "/addReservationRecord")
@@ -41,7 +44,14 @@ public class ReservationRecordController {
                 throw new Exception(theBook.getBookname() + " 已經預約過了，無法再次預約");
             }
 
+            if (suspensionService.getUserActiveSuspension(userid) != null) {
+                throw new Exception(theBook.getBookname() + " 使用者已被停權，無法借閱圖書");
+            }
+
             // 檢查用戶書籍是否已借閱 !!
+            if (borrowService.getBorrowByUserIdAndBookId(userid, bookid) != null) {
+                throw new Exception(theBook.getBookname() + " 已經借閱過了，無法再次預約");
+            }
 
             ReservationRecord reservationRecord = new ReservationRecord();
             reservationRecord.setUserid(userid);
@@ -59,6 +69,10 @@ public class ReservationRecordController {
             } else if (e.getMessage().contains("未借出")) {
                 return MyResult.getResultMap(1, e.getMessage());
             } else if (e.getMessage().contains("已經預約過了，無法再次預約")) {
+                return MyResult.getResultMap(1, e.getMessage());
+            } else if (e.getMessage().contains("使用者已被停權")) {
+                return MyResult.getResultMap(1, e.getMessage());
+            } else if (e.getMessage().contains("已經借閱過了")) {
                 return MyResult.getResultMap(1, e.getMessage());
             } else if (e.getMessage().contains("預約書籍失敗")) {
                 return MyResult.getResultMap(2, "請聯絡管理員");

@@ -27,4 +27,6 @@ public interface BorrowService {
     Borrow queryBorrowsById(Integer borrowid);
 
     List<Borrow> findOverdueBooks();
+
+    Integer getBorrowByUserIdAndBookId(Integer userId, Integer bookId);
 }

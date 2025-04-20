@@ -133,4 +133,9 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     public List<Borrow> findOverdueBooks() { return borrowMapper.findOverdueBooks(); }
+
+    @Override
+    public Integer getBorrowByUserIdAndBookId(Integer userId, Integer bookId) {
+        return borrowMapper.selectCountByUserIdAndBookId(userId, bookId);
+    }
 }

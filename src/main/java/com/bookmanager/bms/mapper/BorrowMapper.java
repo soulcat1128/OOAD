@@ -32,4 +32,6 @@ public interface BorrowMapper {
     List<Borrow> selectAllByLimitByReader(@Param("begin") Integer begin, @Param("size") Integer size, @Param("userid") Integer userid);
 
     List<Borrow> findOverdueBooks();
+
+    int selectCountByUserIdAndBookId(@Param("userid") Integer userid, @Param("bookid") Integer bookid);
 }

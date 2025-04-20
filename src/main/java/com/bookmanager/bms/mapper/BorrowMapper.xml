@@ -174,4 +174,11 @@
     where returnTime is null
     and expectedReturnTime &lt; NOW()
   </select>
+  <select id="selectCountByUserIdAndBookId" resultType="int">
+    SELECT COUNT(*)
+    FROM borrow
+    WHERE userId = #{userid}
+      AND bookId = #{bookid}
+      AND returnTime IS NULL
+  </select>
 </mapper>
