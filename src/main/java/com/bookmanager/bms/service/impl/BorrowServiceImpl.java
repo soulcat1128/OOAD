@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -130,4 +131,6 @@ public class BorrowServiceImpl implements BorrowService {
         return borrowMapper.selectByPrimaryKey(borrowid);
     }
 
+    @Override
+    public List<Borrow> findOverdueBooks() { return borrowMapper.findOverdueBooks(); }
 }

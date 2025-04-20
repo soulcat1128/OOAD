@@ -4,64 +4,116 @@
     <resultMap id="BaseResultMap" type="com.bookmanager.bms.model.Appeal">
         <id column="appealId" property="appealid" jdbcType="INTEGER" />
         <result column="userId" property="userid" jdbcType="INTEGER" />
+        <result column="suspensionId" property="suspensionid" jdbcType="INTEGER" />
         <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
         <result column="status" property="status" jdbcType="TINYINT" />
         <result column="appealContent" property="appealContent" jdbcType="VARCHAR" />
+        <result column="adminReply" property="adminReply" jdbcType="VARCHAR" />
+        <result column="replyTime" property="replyTime" jdbcType="TIMESTAMP" />
+        <result column="userName" property="username" jdbcType="VARCHAR" />
+        <result column="suspensionReason" property="suspensionReason" jdbcType="VARCHAR" />
     </resultMap>
+    
     <sql id="Base_Column_List">
-        appealId, userId, createTime, status, appealContent
+        appealId, userId, suspensionId, createTime, status, appealContent, adminReply, replyTime
     </sql>
+    
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         SELECT
         <include refid="Base_Column_List" />
         FROM appeal
         WHERE appealId = #{appealId, jdbcType=INTEGER}
     </select>
+    
+    <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT a.*, u.userName 
+        FROM appeal a
+        LEFT JOIN user u ON a.userId = u.userId
+        WHERE a.userId = #{userId, jdbcType=INTEGER}
+        ORDER BY a.createTime DESC
+    </select>
+    
+    <select id="selectAllWithUserInfo" resultMap="BaseResultMap">
+        SELECT a.*, u.userName, s.suspensionReason
+        FROM appeal a
+        LEFT JOIN user u ON a.userId = u.userId
+        LEFT JOIN suspension_record s ON a.suspensionId = s.suspensionId
+        ORDER BY a.createTime DESC
+    </select>
+    
+    <select id="selectByStatusWithUserInfo" resultMap="BaseResultMap" parameterType="java.lang.Byte">
+        SELECT a.*, u.userName, s.suspensionReason
+        FROM appeal a
+        LEFT JOIN user u ON a.userId = u.userId
+        LEFT JOIN suspension_record s ON a.suspensionId = s.suspensionId
+        WHERE a.status = #{status, jdbcType=TINYINT}
+        ORDER BY a.createTime DESC
+    </select>
+    
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         DELETE FROM appeal
         WHERE appealId = #{appealId, jdbcType=INTEGER}
     </delete>
-    <insert id="insert" parameterType="com.bookmanager.bms.model.Appeal">
-        INSERT INTO appeal (appealId, userId, createTime, status, appealContent)
+    
+    <insert id="insert" parameterType="com.bookmanager.bms.model.Appeal" useGeneratedKeys="true" keyProperty="appealid">
+        INSERT INTO appeal (appealId, userId, suspensionId, createTime, status, appealContent, adminReply, replyTime)
         VALUES (#{appealid, jdbcType=INTEGER},
                 #{userid, jdbcType=INTEGER},
+                #{suspensionid, jdbcType=INTEGER},
                 #{createTime, jdbcType=TIMESTAMP},
                 #{status, jdbcType=TINYINT},
-                #{appealContent, jdbcType=VARCHAR})
+                #{appealContent, jdbcType=VARCHAR},
+                #{adminReply, jdbcType=VARCHAR},
+                #{replyTime, jdbcType=TIMESTAMP})
     </insert>
-    <insert id="insertSelective" parameterType="com.bookmanager.bms.model.Appeal">
+    
+    <insert id="insertSelective" parameterType="com.bookmanager.bms.model.Appeal" useGeneratedKeys="true" keyProperty="appealid">
         INSERT INTO appeal
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="appealid != null">appealId,</if>
             <if test="userid != null">userId,</if>
+            <if test="suspensionid != null">suspensionId,</if>
             <if test="createTime != null">createTime,</if>
             <if test="status != null">status,</if>
             <if test="appealContent != null">appealContent,</if>
+            <if test="adminReply != null">adminReply,</if>
+            <if test="replyTime != null">replyTime,</if>
         </trim>
         <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
             <if test="appealid != null">#{appealid, jdbcType=INTEGER},</if>
             <if test="userid != null">#{userid, jdbcType=INTEGER},</if>
+            <if test="suspensionid != null">#{suspensionid, jdbcType=INTEGER},</if>
             <if test="createTime != null">#{createTime, jdbcType=TIMESTAMP},</if>
             <if test="status != null">#{status, jdbcType=TINYINT},</if>
             <if test="appealContent != null">#{appealContent, jdbcType=VARCHAR},</if>
+            <if test="adminReply != null">#{adminReply, jdbcType=VARCHAR},</if>
+            <if test="replyTime != null">#{replyTime, jdbcType=TIMESTAMP},</if>
         </trim>
     </insert>
+    
     <update id="updateByPrimaryKeySelective" parameterType="com.bookmanager.bms.model.Appeal">
         UPDATE appeal
         <set>
             <if test="userid != null">userId = #{userid, jdbcType=INTEGER},</if>
+            <if test="suspensionid != null">suspensionId = #{suspensionid, jdbcType=INTEGER},</if>
             <if test="createTime != null">createTime = #{createTime, jdbcType=TIMESTAMP},</if>
             <if test="status != null">status = #{status, jdbcType=TINYINT},</if>
             <if test="appealContent != null">appealContent = #{appealContent, jdbcType=VARCHAR},</if>
+            <if test="adminReply != null">adminReply = #{adminReply, jdbcType=VARCHAR},</if>
+            <if test="replyTime != null">replyTime = #{replyTime, jdbcType=TIMESTAMP},</if>
         </set>
         WHERE appealId = #{appealid, jdbcType=INTEGER}
     </update>
+    
     <update id="updateByPrimaryKey" parameterType="com.bookmanager.bms.model.Appeal">
         UPDATE appeal
         SET userId = #{userid, jdbcType=INTEGER},
+            suspensionId = #{suspensionid, jdbcType=INTEGER},
             createTime = #{createTime, jdbcType=TIMESTAMP},
             status = #{status, jdbcType=TINYINT},
-            appealContent = #{appealContent, jdbcType=VARCHAR}
+            appealContent = #{appealContent, jdbcType=VARCHAR},
+            adminReply = #{adminReply, jdbcType=VARCHAR},
+            replyTime = #{replyTime, jdbcType=TIMESTAMP}
         WHERE appealId = #{appealid, jdbcType=INTEGER}
     </update>
 </mapper>
