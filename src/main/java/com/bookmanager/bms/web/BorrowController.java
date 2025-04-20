@@ -138,7 +138,7 @@ public class BorrowController {
             if(theBook == null) {  // 圖書不存在
                 throw new NullPointerException("圖書" + bookid + "不存在");
             } else if(theBorrow == null) {   //結束記錄不存在
-                throw new NullPointerException("借書記錄" + bookid + "不存在");
+                throw new NullPointerException("借書記錄" + borrowid + "不存在");
             } else if(theBorrow.getReturntime() != null) {  // 已經還過書
                 throw new NotEnoughException("圖書" + bookid + "已經還過了");
             }
@@ -160,8 +160,9 @@ public class BorrowController {
 
             Integer resp = reservationRecordService.updateStatusByReservationList(bookid);
             if (resp != 0) {
-                Integer res3 = this.borrowBook(resp, bookid);
-                if (res3 == 0) {
+                Map<String, Object> res3 = this.borrowBook(resp, bookid);
+                Integer status = (Integer) res3.get("status");
+                if (status != null && status > 0) {
                     throw new OperationFailureException("圖書" + bookid + "借閱失敗");
                 }
             }
@@ -268,7 +269,7 @@ public class BorrowController {
 
     // 批次處理歸還
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private void processReturnOverdueBook(Integer borrowid, Integer bookid) {
+    public void processReturnOverdueBook(Integer borrowid, Integer bookid) {
         try {
             // 更新圖書狀態
             BookInfo bookInfo = new BookInfo();
