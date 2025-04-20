@@ -21,13 +21,13 @@ public interface ReservationRecordMapper {
 
     List<ReservationRecord> selectByUserId(Integer reservationId);
 
-    List<ReservationRecord> selectByBookId(Integer reservationId);
+    List<ReservationRecord> selectByBookId(Integer bookid);
 
     List<ReservationRecord> selectByBookIdAndUserId(Integer bookId, Integer userId);
 
     Integer selectCountBySearch(Map<String, Object> params);
 
-    List<ReservationRecord> selectBySearch(Map<String, Object> params);
+    List<Map<String, Object>> selectBySearch(Map<String, Object> params);
 
     SuspensionRecord getCurrentUserSuspension(Integer userId);
 }

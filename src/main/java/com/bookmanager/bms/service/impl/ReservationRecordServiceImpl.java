@@ -26,13 +26,15 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
     }
 
     @Override
-    public Integer updateReservationRecord(ReservationRecord reservationRecord) {
+    public Integer updateReservationRecord(Integer bookid) {
+        ReservationRecord reservationRecord = new ReservationRecord();
+        reservationRecord.setBookid(bookid);
         return reservationRecordMapper.updateByPrimaryKey(reservationRecord);
     }
 
     @Override
-    public Integer deleteReservationRecord(Integer id) {
-        return reservationRecordMapper.deleteByPrimaryKey(id);
+    public Integer deleteReservationRecord(Integer reservationid) {
+        return reservationRecordMapper.deleteByPrimaryKey(reservationid);
     }
 
     @Override
@@ -59,14 +61,18 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
     }
 
     @Override
-    public Integer updateStatusByReservationList(List<ReservationRecord> reservationRecords) {
+    public Integer updateStatusByReservationList(Integer bookid) {
+        List<ReservationRecord> reservationRecords = reservationRecordMapper.selectByBookId(bookid);
         if (reservationRecords == null || reservationRecords.isEmpty()) {
             return 0;
         }
         for (ReservationRecord record : reservationRecords) {
             if (record.getStatus() != null && record.getStatus() == 0) {
                 record.setStatus((byte) 1); // 將 status 改為 1
-                return reservationRecordMapper.updateByPrimaryKeySelective(record);
+                if (reservationRecordMapper.updateByPrimaryKeySelective(record) == 0) {
+                    return 0; // 更新失敗，返回 0
+                }
+                return record.getUserid();
             }
         }
         return 0;
@@ -83,7 +89,8 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
     }
 
     @Override
-    public List<ReservationRecord> searchReservationRecordsByPage(Map<String, Object> params) {
+    public List<Map<String, Object>> searchReservationRecordsByPage(Map<String, Object> params) {
+        List<Map<String, Object>> reservationRecords = reservationRecordMapper.selectBySearch(params);
         return reservationRecordMapper.selectBySearch(params);
     }
 }

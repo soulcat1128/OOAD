@@ -10,19 +10,19 @@ public interface ReservationRecordService {
 
     ReservationRecord getReservationRecord(Integer id);
 
-    Integer updateReservationRecord(ReservationRecord reservationRecord);
+    Integer updateReservationRecord(Integer bookid);
 
-    Integer deleteReservationRecord(Integer id);
+    Integer deleteReservationRecord(Integer reservationid);
 
     Integer searchStatusByUserIdAndBookId(Integer userId, Integer bookId);
 
     Integer setStatusById(Integer id, Integer status);
 
-    Integer updateStatusByReservationList(List<ReservationRecord> reservationRecords);
+    Integer updateStatusByReservationList(Integer bookid);
 
     List<ReservationRecord> getReservationRecordsByUserId(Integer userId);
 
     int getSearchCount(Map<String, Object> map);
 
-    List<ReservationRecord> searchReservationRecordsByPage(Map<String, Object> params);
+    List<Map<String, Object>> searchReservationRecordsByPage(Map<String, Object> params);
 }

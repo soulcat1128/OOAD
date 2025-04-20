@@ -7,6 +7,7 @@ import com.bookmanager.bms.model.Borrow;
 import com.bookmanager.bms.model.SuspensionRecord;
 import com.bookmanager.bms.service.BookInfoService;
 import com.bookmanager.bms.service.BorrowService;
+import com.bookmanager.bms.service.ReservationRecordService;
 import com.bookmanager.bms.service.SuspensionService;
 import com.bookmanager.bms.utils.MyResult;
 import com.bookmanager.bms.utils.MyUtils;
@@ -37,6 +38,8 @@ public class BorrowController {
     BookInfoService bookInfoService;
     @Autowired
     SuspensionService suspensionService;
+    @Autowired
+    ReservationRecordService reservationRecordService;
 
     // 分頁查詢借閱 params: {page, limit, userid, bookid}
     @RequestMapping(value = "/queryBorrowsByPage")
@@ -131,6 +134,7 @@ public class BorrowController {
             // 查詢借書的情況
             Borrow theBorrow = borrowService.queryBorrowsById(borrowid);
 
+
             if(theBook == null) {  // 圖書不存在
                 throw new NullPointerException("圖書" + bookid + "不存在");
             } else if(theBorrow == null) {   //結束記錄不存在
@@ -153,6 +157,14 @@ public class BorrowController {
             borrow.setReturntime(now);
             Integer res1 = borrowService.updateBorrow2(borrow);
             if(res1 == 0) throw new OperationFailureException("圖書" + bookid + "更新借閱記錄失敗");
+
+            Integer resp = reservationRecordService.updateStatusByReservationList(bookid);
+            if (resp != 0) {
+                Integer res3 = this.borrowBook(resp, bookid);
+                if (res3 == 0) {
+                    throw new OperationFailureException("圖書" + bookid + "借閱失敗");
+                }
+            }
 
             return MyResult.getResultMap(0, "圖書歸還成功");
         } catch (Exception e) {

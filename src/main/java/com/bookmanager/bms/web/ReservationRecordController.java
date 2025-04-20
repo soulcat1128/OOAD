@@ -41,7 +41,7 @@ public class ReservationRecordController {
                 throw new Exception(theBook.getBookname() + " 已經預約過了，無法再次預約");
             }
 
-            // 檢查用戶是否有未還的書籍 !!
+            // 檢查用戶書籍是否已借閱 !!
 
             ReservationRecord reservationRecord = new ReservationRecord();
             reservationRecord.setUserid(userid);
@@ -72,14 +72,14 @@ public class ReservationRecordController {
         return reservationRecordService.getReservationRecord(id);
     }
 
-    @PutMapping(value = "/updateReservationRecord")
-    public Integer updateReservationRecord(ReservationRecord reservationRecord) {
-        return reservationRecordService.updateReservationRecord(reservationRecord);
+    @PutMapping(value = "/updateStatusByReservationList")
+    public Integer updateReservationRecord(Integer bookid) {
+        return reservationRecordService.updateStatusByReservationList(bookid);
     }
 
     @DeleteMapping(value = "/cancelReservationRecord")
-    public Integer deleteReservationRecord(Integer id) {
-        return reservationRecordService.deleteReservationRecord(id);
+    public Integer deleteReservationRecord(Integer reservationId) {
+        return reservationRecordService.deleteReservationRecord(reservationId);
     }
 
     @GetMapping(value = "/getReservationRecordsByUserId")
@@ -91,7 +91,7 @@ public class ReservationRecordController {
     public Map<String, Object> queryReservationRecordByPage(@RequestParam Map<String, Object> params) {
         MyUtils.parsePageParams(params);
         int count = reservationRecordService.getSearchCount(params);
-        List<ReservationRecord> reservationRecords = reservationRecordService.searchReservationRecordsByPage(params);
+        List<Map<String, Object>> reservationRecords = reservationRecordService.searchReservationRecordsByPage(params);
         return MyResult.getListResultMap(0, "success", count, reservationRecords);
     }
 }
