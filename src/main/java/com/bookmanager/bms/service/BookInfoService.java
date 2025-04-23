@@ -14,7 +14,7 @@ public interface BookInfoService {
 
     Integer getSearchCount(Map<String, Object> params);
 
-    List<BookInfo> searchBookInfosByPage(Map<String, Object> params);
+    Map<String, Object> searchBookInfosByPage(Map<String, Object> params);
 
     Integer addBookInfo(BookInfo bookInfo);
 

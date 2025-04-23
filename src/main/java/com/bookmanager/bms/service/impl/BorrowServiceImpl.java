@@ -2,7 +2,6 @@ package com.bookmanager.bms.service.impl;
 
 import com.bookmanager.bms.exception.NotEnoughException;
 import com.bookmanager.bms.exception.OperationFailureException;
-import com.bookmanager.bms.mapper.BookInfoMapper;
 import com.bookmanager.bms.mapper.BorrowMapper;
 import com.bookmanager.bms.model.BookInfo;
 import com.bookmanager.bms.model.Borrow;
@@ -13,7 +12,6 @@ import com.bookmanager.bms.service.ReservationRecordService;
 import com.bookmanager.bms.service.SuspensionService;
 import com.bookmanager.bms.utils.MyResult;
 import com.bookmanager.bms.utils.MyUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

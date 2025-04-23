@@ -32,10 +32,7 @@ public class BookInfoController {
     // 分頁搜索查詢圖書資訊 params: {page, limit, bookname, bookauthor, booktypeid}
     @GetMapping(value = "/queryBookInfosByPage")
     public Map<String, Object> queryBookInfosByPage(@RequestParam Map<String, Object> params){
-        MyUtils.parsePageParams(params);
-        int count = bookInfoService.getSearchCount(params);  // 獲得總數
-        List<BookInfo> bookInfos = bookInfoService.searchBookInfosByPage(params);  // 分頁查詢
-        return MyResult.getListResultMap(0, "success", count, bookInfos);
+        return bookInfoService.searchBookInfosByPage(params);
     }
 
     // 添加圖書資訊

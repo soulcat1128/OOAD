@@ -1,7 +1,5 @@
 package com.bookmanager.bms.web;
 
-import com.bookmanager.bms.exception.NotEnoughException;
-import com.bookmanager.bms.exception.OperationFailureException;
 import com.bookmanager.bms.model.BookInfo;
 import com.bookmanager.bms.model.Borrow;
 import com.bookmanager.bms.model.SuspensionRecord;
@@ -10,7 +8,6 @@ import com.bookmanager.bms.service.BorrowService;
 import com.bookmanager.bms.service.ReservationRecordService;
 import com.bookmanager.bms.service.SuspensionService;
 import com.bookmanager.bms.utils.MyResult;
-import com.bookmanager.bms.utils.MyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,7 +23,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/borrow")
@@ -38,8 +34,6 @@ public class BorrowController {
     BookInfoService bookInfoService;
     @Autowired
     SuspensionService suspensionService;
-    @Autowired
-    ReservationRecordService reservationRecordService;
 
     // 分頁查詢借閱 params: {page, limit, userid, bookid}
     @RequestMapping(value = "/queryBorrowsByPage")
