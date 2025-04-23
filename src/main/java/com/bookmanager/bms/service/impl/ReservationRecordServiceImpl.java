@@ -38,7 +38,7 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
         } else if (theBook.getIsborrowed() == 0) {
             return MyResult.getResultMap(1, theBook.getBookname() + " 未借出，無法預約");
         }
-        if (suspensionService.getUserActiveSuspension(userid) == null) {
+        if (suspensionService.getUserActiveSuspension(userid) != null) {
             return MyResult.getResultMap(1, "使用者已被停權，無法借閱圖書");
         }
         if (borrowService.getBorrowByUserIdAndBookId(userid, bookid) == null) {
