@@ -44,10 +44,7 @@ public class BorrowController {
     // 分頁查詢借閱 params: {page, limit, userid, bookid}
     @RequestMapping(value = "/queryBorrowsByPage")
     public Map<String, Object> queryBorrowsByPage(@RequestParam Map<String, Object> params){
-        MyUtils.parsePageParams(params);
-        int count = borrowService.getSearchCount(params);
-        List<Borrow> borrows = borrowService.searchBorrowsByPage(params);
-        return MyResult.getListResultMap(0, "success", count, borrows);
+        return borrowService.searchBorrowsByPage(params);
     }
 
     // 添加借閱
@@ -84,96 +81,14 @@ public class BorrowController {
     @RequestMapping(value = {"/borrowBook", "/reader/borrowBook"})
     @Transactional
     public Map<String, Object> borrowBook(Integer userid, Integer bookid){
-        try{
-            // 檢查使用者借閱權限
-            SuspensionRecord suspensionRecord =  suspensionService.getUserActiveSuspension(userid);
-            if(suspensionRecord != null)
-            {
-                return MyResult.getResultMap(1, "使用者已被停權，無法借閱圖書");
-            }
-
-            // 查詢該書的情況
-            BookInfo theBook = bookInfoService.queryBookInfoById(bookid);
-            if(theBook == null) {  // 圖書不存在
-                return MyResult.getResultMap(2, "圖書" + bookid + "不存在");
-            } else if(theBook.getIsborrowed() == 1) {  // 已經被借
-                return MyResult.getResultMap(3, "圖書" + bookid + "庫存不足（已經被借走）");  // TODO : 之後改預約
-            }
-
-            // 更新圖書表的isBorrowed
-            BookInfo bookInfo = new BookInfo();
-            bookInfo.setBookid(bookid);
-            bookInfo.setIsborrowed((byte) 1);
-            Integer res2 = bookInfoService.updateBookInfo(bookInfo);
-            if(res2 == 0) return MyResult.getResultMap(4, "圖書" + bookid + "更新被借資訊失敗");
-
-            // 添加一條紀錄到borrow表
-            Borrow borrow = new Borrow();
-            borrow.setUserid(userid);
-            borrow.setBookid(bookid);
-            borrow.setBorrowtime(new Date(System.currentTimeMillis()));
-            Integer res1 = borrowService.addBorrow2(borrow);
-            if(res1 == 0) return MyResult.getResultMap(5, "圖書" + bookid + "添加借閱記錄失敗");
-
-            return MyResult.getResultMap(0, "借閱成功");
-        } catch (Exception e) {
-            System.out.println("發生異常，進行手動回滾");
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            e.printStackTrace();
-            return MyResult.getResultMap(6, e.getMessage());
-        }
+        return borrowService.addBorrow2(userid, bookid);
     }
 
     // 還書
     @RequestMapping(value = {"/returnBook", "/reader/returnBook"})
     @Transactional
     public Map<String, Object> returnBook(Integer borrowid, Integer bookid){
-        try {
-            // 查詢該書的情況
-            BookInfo theBook = bookInfoService.queryBookInfoById(bookid);
-            // 查詢借書的情況
-            Borrow theBorrow = borrowService.queryBorrowsById(borrowid);
-
-
-            if(theBook == null) {  // 圖書不存在
-                throw new NullPointerException("圖書" + bookid + "不存在");
-            } else if(theBorrow == null) {   //結束記錄不存在
-                throw new NullPointerException("借書記錄" + borrowid + "不存在");
-            } else if(theBorrow.getReturntime() != null) {  // 已經還過書
-                throw new NotEnoughException("圖書" + bookid + "已經還過了");
-            }
-
-            // 更新圖書表的isBorrowed
-            BookInfo bookInfo = new BookInfo();
-            bookInfo.setBookid(bookid);
-            bookInfo.setIsborrowed((byte) 0);
-            Integer res2 = bookInfoService.updateBookInfo(bookInfo);
-            if(res2 == 0) throw new OperationFailureException("圖書" + bookid + "更新被借資訊失敗");
-
-            // 更新Borrow表，更新結束時間
-            Date now = new Date();
-            Borrow borrow = new Borrow();
-            borrow.setBorrowid(borrowid);
-            borrow.setReturntime(now);
-            Integer res1 = borrowService.updateBorrow2(borrow);
-            if(res1 == 0) throw new OperationFailureException("圖書" + bookid + "更新借閱記錄失敗");
-
-            Integer resp = reservationRecordService.updateStatusByReservationList(bookid);
-            if (resp != 0) {
-                Map<String, Object> res3 = this.borrowBook(resp, bookid);
-                Integer status = (Integer) res3.get("status");
-                if (status != null && status > 0) {
-                    throw new OperationFailureException("圖書" + bookid + "借閱失敗");
-                }
-            }
-
-            return MyResult.getResultMap(0, "圖書歸還成功");
-        } catch (Exception e) {
-            System.out.println("發生異常，進行手動回滾");
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            e.printStackTrace();
-            return MyResult.getResultMap(1, e.getMessage());
-        }
+        return borrowService.returnBook(borrowid, bookid);
     }
 
     // 延長借閱

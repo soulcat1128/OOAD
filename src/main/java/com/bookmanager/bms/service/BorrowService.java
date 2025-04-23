@@ -10,11 +10,11 @@ public interface BorrowService {
 
     Integer getSearchCount(Map<String, Object> params);
 
-    List<Borrow> searchBorrowsByPage(Map<String, Object> params);
+    Map<String, Object> searchBorrowsByPage(Map<String, Object> params);
 
     Integer addBorrow(Borrow borrow);
 
-    Integer addBorrow2(Borrow borrow);
+    Map<String, Object> addBorrow2(Integer userid, Integer bookid);
 
     Integer deleteBorrow(Borrow borrow);
 
@@ -22,11 +22,13 @@ public interface BorrowService {
 
     Integer updateBorrow(Borrow borrow);
 
-    Integer updateBorrow2(Borrow borrow);
+    Map<String, Object> returnBook(Integer borrowid, Integer bookid);
 
     Borrow queryBorrowsById(Integer borrowid);
 
     List<Borrow> findOverdueBooks();
 
     Integer getBorrowByUserIdAndBookId(Integer userId, Integer bookId);
+
+    Integer updateBorrow2(Borrow borrow);
 }

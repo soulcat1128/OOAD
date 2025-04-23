@@ -22,7 +22,5 @@ public interface ReservationRecordService {
 
     List<ReservationRecord> getReservationRecordsByUserId(Integer userId);
 
-    int getSearchCount(Map<String, Object> map);
-
     Map<String, Object> searchReservationRecordsByPage(Map<String, Object> params);
 }

@@ -120,11 +120,6 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
     }
 
     @Override
-    public int getSearchCount(Map<String, Object> params) {
-        return reservationRecordMapper.selectCountBySearch(params);
-    }
-
-    @Override
     public Map<String, Object> searchReservationRecordsByPage(Map<String, Object> params) {
         MyUtils.parsePageParams(params);
         int count = reservationRecordMapper.selectCountBySearch(params);
