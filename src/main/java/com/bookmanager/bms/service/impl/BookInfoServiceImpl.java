@@ -3,6 +3,8 @@ package com.bookmanager.bms.service.impl;
 import com.bookmanager.bms.mapper.BookInfoMapper;
 import com.bookmanager.bms.model.BookInfo;
 import com.bookmanager.bms.service.BookInfoService;
+import com.bookmanager.bms.utils.MyResult;
+import com.bookmanager.bms.utils.MyUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -36,8 +38,11 @@ public class BookInfoServiceImpl implements BookInfoService {
     }
 
     @Override
-    public List<BookInfo> searchBookInfosByPage(Map<String, Object> params) {
-        return bookInfoMapper.selectBySearch(params);
+    public Map<String, Object> searchBookInfosByPage(Map<String, Object> params) {
+        MyUtils.parsePageParams(params);
+        int count = getSearchCount(params);  // 獲得總數
+        List<BookInfo> bookInfos = bookInfoMapper.selectBySearch(params);  // 分頁查詢
+        return MyResult.getListResultMap(0, "success", count, bookInfos);
     }
 
     @Override

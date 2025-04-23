@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ReservationRecordService {
-    Integer addReservationRecord(ReservationRecord reservationRecord);
+    Map<String, Object> addReservationRecord(Integer userid, Integer bookid);
 
     ReservationRecord getReservationRecord(Integer id);
 
@@ -22,7 +22,5 @@ public interface ReservationRecordService {
 
     List<ReservationRecord> getReservationRecordsByUserId(Integer userId);
 
-    int getSearchCount(Map<String, Object> map);
-
-    List<Map<String, Object>> searchReservationRecordsByPage(Map<String, Object> params);
+    Map<String, Object> searchReservationRecordsByPage(Map<String, Object> params);
 }
