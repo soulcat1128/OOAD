@@ -41,4 +41,16 @@ public class ReservationRecord {
         this.status = reservationStatus;
     }
 
+    /** 是否仍處於「預約中」狀態 */
+    public boolean isActive() {
+        return status != null && status == 0;
+    }
+
+    /** 確認借閱—將狀態由 0 -> 1 */
+    public void confirm() {
+        if (!isActive()) {
+            throw new IllegalStateException("此預約紀錄不可確認借閱（status=" + status + "）");
+        }
+        this.status = 1;
+    }
 }

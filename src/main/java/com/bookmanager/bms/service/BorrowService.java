@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface BorrowService {
+
+    Borrow getById(Integer borrowId);
+
     Integer getCount();
 
     Integer getSearchCount(Map<String, Object> params);

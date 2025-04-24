@@ -75,15 +75,13 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
 
     @Override
     public Integer searchStatusByUserIdAndBookId(Integer userId, Integer bookId) {
-        List<ReservationRecord> RList = reservationRecordMapper.selectByBookIdAndUserId(bookId, userId);
-        for (ReservationRecord record : RList) {
-            if (record.getStatus() != null && record.getStatus() == 0) {
-                return 1; // 找到 status == 0 的預約紀錄，並還沒變成借閱
+        List<ReservationRecord> list = reservationRecordMapper.selectByBookIdAndUserId(bookId, userId);
+        for (ReservationRecord rec : list) {
+            if (rec.isActive()) {
+                return 1;
             }
         }
-
-        return 0; // 沒有任何 status == 0 的紀錄，代表沒有預約
-                  // 或者是 status == 1 的紀錄，代表已經借閱了
+        return 0;
     }
 
     @Override
@@ -97,18 +95,13 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
     }
 
     @Override
-    public Integer updateStatusByReservationList(Integer bookid) {
-        List<ReservationRecord> reservationRecords = reservationRecordMapper.selectByBookId(bookid);
-        if (reservationRecords == null || reservationRecords.isEmpty()) {
-            return 0;
-        }
-        for (ReservationRecord record : reservationRecords) {
-            if (record.getStatus() != null && record.getStatus() == 0) {
-                record.setStatus((byte) 1); // 將 status 改為 1
-                if (reservationRecordMapper.updateByPrimaryKeySelective(record) == 0) {
-                    return 0; // 更新失敗，返回 0
-                }
-                return record.getUserid();
+    public Integer updateStatusByReservationList(Integer bookId) {
+        List<ReservationRecord> list = reservationRecordMapper.selectByBookId(bookId);
+        for (ReservationRecord rec : list) {
+            if (rec.isActive()) {
+                rec.confirm();
+                reservationRecordMapper.updateByPrimaryKeySelective(rec);
+                return rec.getUserid();
             }
         }
         return 0;

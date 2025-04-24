@@ -34,6 +34,15 @@ public class BorrowServiceImpl implements BorrowService {
     @Resource
     private ReservationRecordService reservationRecordService;
 
+    @Override
+    public Borrow getById(Integer borrowId) {
+        return borrowMapper.selectByPrimaryKey(borrowId);
+    }
+
+//    @Override
+//    public List<Borrow> listByUser(Integer userId) {
+//        return borrowMapper.selectByUserId(userId);
+//    }
 
     @Override
     public Integer getCount() {
@@ -93,18 +102,20 @@ public class BorrowServiceImpl implements BorrowService {
         SuspensionRecord suspensionRecord = suspensionService.getUserActiveSuspension(userid);
         BookInfo theBook = bookInfoService.queryBookInfoById(bookid);
 
+        // 查詢該書的情況
+        if(theBook == null) {  // 圖書不存在
+            return MyResult.getResultMap(2, "圖書" + bookid + "不存在");
+        }
+        if(theBook.getIsborrowed() == 1) {  // 已經被借
+            return MyResult.getResultMap(3, "圖書" + bookid + "庫存不足（已經被借走）");
+        }
+
         // 檢查使用者借閱權限
         if(suspensionRecord != null)
         {
             return MyResult.getResultMap(1, "使用者已被停權，無法借閱圖書");
         }
 
-        // 查詢該書的情況
-        if(theBook == null) {  // 圖書不存在
-            return MyResult.getResultMap(2, "圖書" + bookid + "不存在");
-        } else if(theBook.getIsborrowed() == 1) {  // 已經被借
-            return MyResult.getResultMap(3, "圖書" + bookid + "庫存不足（已經被借走）");  // TODO : 之後改預約
-        }
 
         // 更新圖書表的isBorrowed
         BookInfo bookInfo = new BookInfo();
@@ -114,24 +125,12 @@ public class BorrowServiceImpl implements BorrowService {
         if(res2 == 0) return MyResult.getResultMap(4, "圖書" + bookid + "更新被借資訊失敗");
 
         // 添加一條紀錄到borrow表
-        Borrow borrow = new Borrow();
-        borrow.setUserid(userid);
-        borrow.setBookid(bookid);
-        borrow.setBorrowtime(new Date(System.currentTimeMillis()));
-
-        // 新增：設定預期歸還時間（如果為null）
-        if (borrow.getExpectedReturnTime() == null) {
-            // 預設為借閱時間 + 30天
-            java.util.Calendar calendar = java.util.Calendar.getInstance();
-            calendar.setTime(borrow.getBorrowtime());
-            calendar.add(java.util.Calendar.DAY_OF_MONTH, 30);
-            borrow.setExpectedReturnTime(calendar.getTime());
-        }
-
-        // 新增：設定是否延長借閱（如果為null）
-        if (borrow.getIsExtended() == null) {
-            borrow.setIsExtended(0); // 0表示未延長
-        }
+        Date now = new Date(System.currentTimeMillis());
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.setTime(now);
+        calendar.add(java.util.Calendar.DAY_OF_MONTH, 30);
+        Date expected = calendar.getTime();
+        Borrow borrow = Borrow.newBorrow(userid, bookid, null, null, now, expected);
 
         int res1 = borrowMapper.insertSelective(borrow);
         if(res1 == 0) return MyResult.getResultMap(5, "圖書" + bookid + "添加借閱記錄失敗");
@@ -182,9 +181,9 @@ public class BorrowServiceImpl implements BorrowService {
             throw new NullPointerException("圖書" + bookid + "不存在");
         } else if(theBorrow == null) {   //結束記錄不存在
             throw new NullPointerException("借書記錄" + borrowid + "不存在");
-        } else if(theBorrow.getReturntime() != null) {  // 已經還過書
-            throw new NotEnoughException("圖書" + bookid + "已經還過了");
         }
+
+        theBorrow.completeReturn(new Date(System.currentTimeMillis()));
 
         // 更新圖書表的isBorrowed
         BookInfo bookInfo = new BookInfo();
