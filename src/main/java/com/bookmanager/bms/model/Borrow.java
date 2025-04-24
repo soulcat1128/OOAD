@@ -1,5 +1,10 @@
 package com.bookmanager.bms.model;
 
+import com.bookmanager.bms.exception.NotEnoughException;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Borrow {
@@ -111,4 +116,64 @@ public class Borrow {
     public Integer getIsExtended() { return isExtended;}
 
     public void setIsExtended(Integer isExtended) { this.isExtended = isExtended; }
+
+    public static Borrow newBorrow(Integer userid, Integer bookid, String username, String bookname, Date borrowtime, Date expectedReturnTime) {
+        Borrow b = new Borrow();
+        b.userid = userid;
+        b.bookid = bookid;
+        b.username = username;
+        b.bookname = bookname;
+        b.borrowtime = borrowtime;
+        b.expectedReturnTime = expectedReturnTime;
+        b.isExtended = 0;
+        return b;
+    }
+
+    public boolean isReturned() {
+        return returntime != null;
+    }
+
+    public boolean isOverdue(Date borrowtime) {
+        return !isReturned() && borrowtime.after(expectedReturnTime);
+    }
+
+    public boolean isExtended() {
+        return isExtended == 1;
+    }
+
+    public void extend() {
+        if (isExtended()) {
+            throw new IllegalStateException("已經延長過，無法再次延長");
+        }
+        if (isReturned()) {
+            throw new IllegalStateException("已歸還，無法延長");
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.expectedReturnTime);
+        cal.add(Calendar.DAY_OF_MONTH, 30);
+        this.expectedReturnTime = cal.getTime();
+        this.isExtended = 1;
+    }
+
+    public void completeReturn(Date returnTime) {
+        if (isReturned()) {
+            throw new NotEnoughException("已經還過了");
+        }
+        returntime = returnTime;
+    }
+
+    public long daysUntilDue(Date now) {
+        Instant exp = expectedReturnTime.toInstant();
+        Instant cur = now          .toInstant();
+        if (isReturned()) {
+            // 已歸還：算實際歸還時間（actualReturnTime）到到期日的差距
+            // 假設你重構後把 actualReturnTime 記錄在 model，就改成 actualReturnTime.toInstant()
+            return ChronoUnit.DAYS.between(exp, cur);
+        }
+        // 尚未歸還：算現在到到期日的差距
+        return ChronoUnit.DAYS.between(cur, exp);
+    }
+
+
+
 }

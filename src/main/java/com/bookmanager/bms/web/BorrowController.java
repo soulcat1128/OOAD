@@ -35,6 +35,7 @@ public class BorrowController {
     @Autowired
     SuspensionService suspensionService;
 
+
     // 分頁查詢借閱 params: {page, limit, userid, bookid}
     @RequestMapping(value = "/queryBorrowsByPage")
     public Map<String, Object> queryBorrowsByPage(@RequestParam Map<String, Object> params){
@@ -82,7 +83,15 @@ public class BorrowController {
     @RequestMapping(value = {"/returnBook", "/reader/returnBook"})
     @Transactional
     public Map<String, Object> returnBook(Integer borrowid, Integer bookid){
-        return borrowService.returnBook(borrowid, bookid);
+        try {
+            return borrowService.returnBook(borrowid, bookid);
+        }
+        catch (Exception e) {
+            System.out.println("發生異常，進行手動回滾");
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            e.printStackTrace();
+            return MyResult.getResultMap(1, e.getMessage());
+        }
     }
 
     // 延長借閱
