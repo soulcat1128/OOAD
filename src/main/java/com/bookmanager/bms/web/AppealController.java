@@ -123,22 +123,4 @@ public class AppealController {
             return MyResult.getResultMap(2, "系統錯誤: " + e.getMessage());
         }
     }
-    
-    /**
-     * 獲取用戶當前的停權記錄（用於提交申訴時選擇）
-     */
-    @RequestMapping(value = {"/getUserActiveSuspensions", "/reader/getUserActiveSuspensions"})
-    public Map<String, Object> getUserActiveSuspensions(@RequestParam Integer userId) {
-        try {
-            SuspensionRecord record = suspensionService.getUserActiveSuspension(userId);
-            if (record != null) {
-                return MyResult.getResultMap(0, "success", record);
-            } else {
-                return MyResult.getResultMap(1, "未找到當前有效的停權記錄");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return MyResult.getResultMap(2, "系統錯誤: " + e.getMessage());
-        }
-    }
 }

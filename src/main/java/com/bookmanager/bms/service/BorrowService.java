@@ -27,11 +27,11 @@ public interface BorrowService {
 
     Map<String, Object> returnBook(Integer borrowid, Integer bookid);
 
-    Borrow queryBorrowsById(Integer borrowid);
-
     List<Borrow> findOverdueBooks();
 
     Integer getBorrowByUserIdAndBookId(Integer userId, Integer bookId);
 
     Integer updateBorrow2(Borrow borrow);
+    
+    Map<String, Object> extendBorrow(Integer borrowid, Integer bookid);
 }

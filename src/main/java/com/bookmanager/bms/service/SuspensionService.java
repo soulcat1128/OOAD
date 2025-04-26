@@ -33,4 +33,17 @@ public interface SuspensionService {
      * @return 更新結果
      */
     Integer updateSuspensionStatus(Integer suspensionId, Byte borrowingPermission);
+    
+    /**
+     * 檢查並處理超時未歸還的書籍及相關停權
+     * 包含更新已過期的停權記錄和處理過期未還的書籍
+     */
+    void checkAndProcessOverdueBooks();
+    
+    /**
+     * 處理過期書籍的歸還
+     * @param borrowid 借閱ID
+     * @param bookid 書籍ID
+     */
+    void processReturnOverdueBook(Integer borrowid, Integer bookid);
 }
