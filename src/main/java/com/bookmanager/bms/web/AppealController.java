@@ -88,13 +88,12 @@ public class AppealController {
     public Map<String, Object> approveAppeal(@RequestParam Integer appealId, @RequestParam String adminReply, @RequestParam Integer userId) {
         try {
             // 獲取停權相關資訊
-            SuspensionRecord SuspensionRecord = suspensionService.getUserActiveSuspension(userId);
-            if (SuspensionRecord == null) {
+            SuspensionRecord suspensionRecord = suspensionService.getUserActiveSuspension(userId);
+            if (suspensionRecord == null) {
                 return MyResult.getResultMap(3, "使用者當前不為封鎖狀態，無需處理");
             }
 
-
-            Integer result = appealService.approveAppeal(appealId, adminReply, SuspensionRecord);
+            Integer result = appealService.approveAppeal(appealId, adminReply, suspensionRecord);
             if (result > 0) {
                 return MyResult.getResultMap(0, "申訴已批准，用戶借閱權限已恢復");
             } else {

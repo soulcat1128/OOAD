@@ -15,11 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
-import javax.management.OperationsException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class SuspensionServiceImpl implements SuspensionService {
@@ -35,47 +32,34 @@ public class SuspensionServiceImpl implements SuspensionService {
     
     @Override
     public boolean createSuspensionRecord(Borrow borrow) {
-
-        // 一樣要紀錄多筆 不管有沒有被停權過
-
         // 檢查是否已經存在相同的停權記錄
         SuspensionRecord existingRecord = suspensionRecordMapper.findByUserIdAndBorrowId(borrow.getUserid(), borrow.getBorrowid());
         if (existingRecord != null) {
             throw new RuntimeException("已存在相同停權紀錄 suspensionId : " + existingRecord.getSuspensionid());
         }
 
-        // 找處於停權狀態最後一筆停權紀錄 要使用他的時間當新的起始時間
+        // 找處於停權狀態最後一筆停權紀錄
         SuspensionRecord latestSuspensionRecord = suspensionRecordMapper.findLastActiveSuspensionByUserId(borrow.getUserid());
-        // 創建停權記錄
+
         SuspensionRecord record = new SuspensionRecord();
         record.setUserid(borrow.getUserid());
         record.setBorrowid(borrow.getBorrowid());
-        record.setBorrowingPermission((byte) 0); // 0表示禁止借閱
+        record.setBorrowingPermission(SuspensionRecord.BORROWING_PROHIBITED);
+        record.setSuspensionReason("逾期歸還書籍");
         Date startDate;
 
-        if(latestSuspensionRecord == null)
-        {
-            // 設置停權開始時間和結束時間
+        if (latestSuspensionRecord == null) {
             startDate = new Date();
-        }
-        else
-        {
-            // 用前一筆有效紀錄的結束時間，當新一筆紀錄的開始時間
+        } else {
+            // 存在先前的停權紀錄，使用先前紀錄的結束日期作為新記錄的開始日期
             startDate = latestSuspensionRecord.getEndDate();
         }
 
         record.setStartDate(startDate);
+        record.setEndDateFromStart(SuspensionRecord.DEFAULT_SUSPENSION_DAYS);
 
-        // 計算停權結束日期 +7 天
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 7);
-        record.setEndDate(calendar.getTime());
-        record.setSuspensionReason("");
-
-        // 儲存記錄
-        if(suspensionRecordMapper.insertSelective(record) == 0)
-        {
+        // 儲存停權記錄
+        if (suspensionRecordMapper.insertSelective(record) == 0) {
             throw new RuntimeException("停權記錄創建失敗");
         }
         
@@ -90,7 +74,7 @@ public class SuspensionServiceImpl implements SuspensionService {
         
         // 更新這些記錄的借閱權限
         for (SuspensionRecord record : expiredSuspensions) {
-            record.setBorrowingPermission((byte) 1); // 1表示允許借閱
+            record.restorePermission();
             suspensionRecordMapper.updateByPrimaryKeySelective(record);
             updatedCount++;
         }
