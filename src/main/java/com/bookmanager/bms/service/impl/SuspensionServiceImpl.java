@@ -104,17 +104,6 @@ public class SuspensionServiceImpl implements SuspensionService {
     }
     
     @Override
-    public Integer updateSuspensionStatus(Integer suspensionId, Byte borrowingPermission) {
-        SuspensionRecord record = suspensionRecordMapper.selectByPrimaryKey(suspensionId);
-        if (record == null) {
-            return 0;
-        }
-        
-        record.setBorrowingPermission(borrowingPermission);
-        return suspensionRecordMapper.updateByPrimaryKeySelective(record);
-    }
-    
-    @Override
     //@Scheduled(cron = "0 0 0 * * ?") // 每天12:00執行
     @Scheduled(cron = "*/10 * * * * ?") // 測試 10秒/次
     @Transactional
@@ -167,5 +156,11 @@ public class SuspensionServiceImpl implements SuspensionService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new RuntimeException("自動歸還過期書籍失敗: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public SuspensionRecord getLastActiveSuspensionByUserId(Integer userId)
+    {
+        return suspensionRecordMapper.findLastActiveSuspensionByUserId(userId);
     }
 }
