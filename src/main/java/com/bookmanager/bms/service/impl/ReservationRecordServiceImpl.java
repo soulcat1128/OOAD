@@ -41,8 +41,11 @@ public class ReservationRecordServiceImpl implements ReservationRecordService {
         if (suspensionService.getUserActiveSuspension(userid) != null) {
             return MyResult.getResultMap(1, "使用者已被停權，無法借閱圖書");
         }
-        if (borrowService.getBorrowByUserIdAndBookId(userid, bookid) == null) {
+        if (borrowService.getBorrowByUserIdAndBookId(userid, bookid) > 0) {
             return MyResult.getResultMap(1, theBook.getBookname() + " 已經借閱過了，無法再次預約");
+        }
+        if (!reservationRecordMapper.selectByBookIdAndUserId(bookid, userid).isEmpty()) {
+            return MyResult.getResultMap(1, theBook.getBookname() + " 已經預約過了，無法再次預約");
         }
 
         ReservationRecord reservationRecord = new ReservationRecord();
