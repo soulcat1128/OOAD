@@ -19,9 +19,6 @@ public class SuspensionController {
     @Autowired
     private SuspensionService suspensionService;
     
-    @Autowired
-    private SuspensionRecordMapper suspensionRecordMapper;
-
     /**
      * 檢查使用者是否被停權
      * @param userId 使用者ID
@@ -34,7 +31,7 @@ public class SuspensionController {
         }
         else
         {
-            SuspensionRecord record = suspensionRecordMapper.findLastActiveSuspensionByUserId(userId);
+            SuspensionRecord record = suspensionService.getLastActiveSuspensionByUserId(userId);
             if (record != null) {
                 return MyResult.getResultMap(1, "使用者已被停權，停權原因: " + record.getSuspensionReason() +
                                               "，停權開始時間: " + record.getStartDate() +

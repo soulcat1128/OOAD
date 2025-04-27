@@ -23,10 +23,9 @@ public class AppealServiceImpl implements AppealService {
 
     @Override
     public Integer createAppeal(Appeal appeal) {
-        // 設置默認值
         appeal.setCreateTime(new Date());
-        appeal.setStatus((byte) 0); // 0: 待處理
-        
+        appeal.setStatus(Appeal.STATUS_PENDING);
+
         return appealMapper.insertSelective(appeal) > 0 ? appeal.getAppealid() : 0;
     }
 
@@ -54,21 +53,16 @@ public class AppealServiceImpl implements AppealService {
             return 0;
         }
 
-        // 檢查申訴是否已處理
-        if (appeal.getStatus() != 0) {
-            return 0; // 已處理的申訴不能再次處理
+        // 檢查申訴是否可以處理
+        if (!appeal.canProcess()) {
+            return 0;
         }
 
-        // 將停權記錄的borrowingPermission設置為1（允許借閱）
+        // 將停權記錄移除（允許借閱）
         Integer userid = appeal.getUserid();
         suspensionRecordMapper.removeSuspensionByUserId(userid);
-//        suspensionRecord.setBorrowingPermission((byte) 1);
-//        suspensionRecordMapper.updateByPrimaryKeySelective(suspensionRecord);
         
-        // 更新申訴記錄
-        appeal.setStatus((byte) 1); // 1: 已批准
-        appeal.setAdminReply(adminReply);
-        appeal.setReplyTime(new Date());
+        appeal.approve(adminReply);
         
         return appealMapper.updateByPrimaryKeySelective(appeal);
     }
@@ -81,15 +75,12 @@ public class AppealServiceImpl implements AppealService {
             return 0;
         }
         
-        // 檢查申訴是否已處理
-        if (appeal.getStatus() != 0) {
+        // 檢查申訴是否可以處理
+        if (!appeal.canProcess()) {
             return 0; // 已處理的申訴不能再次處理
         }
         
-        // 更新申訴記錄
-        appeal.setStatus((byte) 2); // 2: 已拒絕
-        appeal.setAdminReply(adminReply);
-        appeal.setReplyTime(new Date());
+        appeal.reject(adminReply);
         
         return appealMapper.updateByPrimaryKeySelective(appeal);
     }

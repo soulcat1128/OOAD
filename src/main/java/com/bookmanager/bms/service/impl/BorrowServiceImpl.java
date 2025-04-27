@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class BorrowServiceImpl implements BorrowService {
@@ -175,7 +172,7 @@ public class BorrowServiceImpl implements BorrowService {
         // 查詢該書的情況
         BookInfo theBook = bookInfoService.queryBookInfoById(bookid);
         // 查詢借書的情況
-        Borrow theBorrow = queryBorrowsById(borrowid);
+        Borrow theBorrow = borrowMapper.selectByPrimaryKey(borrowid);
 
         if(theBook == null) {  // 圖書不存在
             throw new NullPointerException("圖書" + bookid + "不存在");
@@ -212,11 +209,6 @@ public class BorrowServiceImpl implements BorrowService {
     }
 
     @Override
-    public Borrow queryBorrowsById(Integer borrowid) {
-        return borrowMapper.selectByPrimaryKey(borrowid);
-    }
-
-    @Override
     public List<Borrow> findOverdueBooks() { return borrowMapper.findOverdueBooks(); }
 
     @Override
@@ -227,5 +219,60 @@ public class BorrowServiceImpl implements BorrowService {
     @Override
     public Integer updateBorrow2(Borrow borrow) {
         return borrowMapper.updateByPrimaryKeySelective(borrow);
+    }
+    
+    @Override
+    public Map<String, Object> extendBorrow(Integer borrowid, Integer bookid) {
+        try {
+            // 查詢借書的情況
+            Borrow theBorrow = borrowMapper.selectByPrimaryKey(borrowid);
+
+            if (theBorrow == null) {
+                return MyResult.getResultMap(2, "借閱記錄不存在");
+            }
+
+            // 檢查使用者借閱權限
+            SuspensionRecord suspensionRecord = suspensionService.getUserActiveSuspension(theBorrow.getUserid());
+            if(suspensionRecord != null) {
+                return MyResult.getResultMap(1, "使用者已被停權，無法延長借閱");
+            }
+
+            if (theBorrow.getReturntime() != null) {
+                return MyResult.getResultMap(3, "該書籍已歸還，無法延長借閱");
+            }
+
+            if (theBorrow.getIsExtended() != null && theBorrow.getIsExtended() == 1) {
+                return MyResult.getResultMap(4, "該借閱已經延長過，每次借閱只能延長一次");
+            }
+
+            // 檢查是否已逾期
+            Date now = new Date();
+
+            if (now.after(theBorrow.getExpectedReturnTime())) {
+                return MyResult.getResultMap(5, "該借閱已超過原借閱期限，故無法延長");
+            }
+
+            // 設置isExtended為1，並延長借閱期限 14 天
+            theBorrow.setIsExtended(1);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(theBorrow.getExpectedReturnTime()); // 原始到期日
+            calendar.add(Calendar.DAY_OF_MONTH, 14);
+            Date newDueDate = calendar.getTime();
+            theBorrow.setExpectedReturnTime(newDueDate);
+
+            Integer res = updateBorrow2(theBorrow);
+
+            if (res == 0) {
+                return MyResult.getResultMap(6, "延長借閱失敗，系統錯誤");
+            }
+
+            // 成功延長，返回新到期日期
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            return MyResult.getResultMap(0, "延長成功，新的歸還日期為: " + sdf.format(newDueDate));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return MyResult.getResultMap(1, e.getMessage());
+        }
     }
 }

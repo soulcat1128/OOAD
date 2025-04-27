@@ -25,12 +25,24 @@ public interface SuspensionService {
      * @return 停權記錄，如果沒有則返回null
      */
     SuspensionRecord getUserActiveSuspension(Integer userId);
+
+    /**
+     * 檢查並處理超時未歸還的書籍及相關停權
+     * 包含更新已過期的停權記錄和處理過期未還的書籍
+     */
+    void checkAndProcessOverdueBooks();
     
     /**
-     * 手動更新停權記錄的狀態
-     * @param suspensionId 停權記錄ID
-     * @param borrowingPermission 借閱權限狀態 (0: 禁止借閱, 1: 允許借閱)
-     * @return 更新結果
+     * 處理過期書籍的歸還
+     * @param borrowid 借閱ID
+     * @param bookid 書籍ID
      */
-    Integer updateSuspensionStatus(Integer suspensionId, Byte borrowingPermission);
+    void processReturnOverdueBook(Integer borrowid, Integer bookid);
+
+    /**
+     * 獲取最新被停權狀態
+     * @param userId
+     * @return
+     */
+    SuspensionRecord getLastActiveSuspensionByUserId(Integer userId);
 }

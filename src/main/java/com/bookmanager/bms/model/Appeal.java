@@ -3,26 +3,21 @@ package com.bookmanager.bms.model;
 import java.util.Date;
 
 public class Appeal {
+    public static final byte STATUS_PENDING = 0;    // 待處理
+    public static final byte STATUS_APPROVED = 1;   // 已批准
+    public static final byte STATUS_REJECTED = 2;   // 已拒絕
+    
     private Integer appealid;
-
     private Integer userid;
-    
     private Integer suspensionid;  // 關聯的停權記錄ID
-    
     private Date createTime;
-
-    private Byte status;  // 0: 待處理, 1: 已批准, 2: 已拒絕
-
+    private Byte status;
     private String appealContent;
-    
-    private String adminReply;  // 管理員回覆
-    
-    private Date replyTime;  // 回覆時間
-    
-    // 以下是非數據庫欄位，用於顯示
+    private String adminReply;     // 管理員回覆
+    private Date replyTime;        // 回覆時間
     private String username;
     private String suspensionReason;
-
+    
     public Integer getAppealid() {
         return appealid;
     }
@@ -101,5 +96,43 @@ public class Appeal {
 
     public void setSuspensionReason(String suspensionReason) {
         this.suspensionReason = suspensionReason;
+    }
+
+    /**
+     * 判斷申訴是否可被處理
+     * @return 如果申訴處於待處理狀態則返回true
+     */
+    public boolean canProcess() {
+        return status == STATUS_PENDING;
+    }
+
+    /**
+     * 處理申訴
+     * @param status 處理後的狀態
+     * @param adminReply 管理員回覆
+     */
+    private void processAppeal(byte status, String adminReply) {
+        if (!canProcess()) {
+            throw new IllegalStateException("這個申訴已經被處理過了");
+        }
+        this.status = status;
+        this.adminReply = adminReply;
+        this.replyTime = new Date();
+    }
+
+    /**
+     * 批准此申訴
+     * @param adminReply 管理員回覆
+     */
+    public void approve(String adminReply) {
+        processAppeal(STATUS_APPROVED, adminReply);
+    }
+
+    /**
+     * 拒絕此申訴
+     * @param adminReply 管理員回覆
+     */
+    public void reject(String adminReply) {
+        processAppeal(STATUS_REJECTED, adminReply);
     }
 }

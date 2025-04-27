@@ -88,13 +88,12 @@ public class AppealController {
     public Map<String, Object> approveAppeal(@RequestParam Integer appealId, @RequestParam String adminReply, @RequestParam Integer userId) {
         try {
             // 獲取停權相關資訊
-            SuspensionRecord SuspensionRecord = suspensionService.getUserActiveSuspension(userId);
-            if (SuspensionRecord == null) {
+            SuspensionRecord suspensionRecord = suspensionService.getUserActiveSuspension(userId);
+            if (suspensionRecord == null) {
                 return MyResult.getResultMap(3, "使用者當前不為封鎖狀態，無需處理");
             }
 
-
-            Integer result = appealService.approveAppeal(appealId, adminReply, SuspensionRecord);
+            Integer result = appealService.approveAppeal(appealId, adminReply, suspensionRecord);
             if (result > 0) {
                 return MyResult.getResultMap(0, "申訴已批准，用戶借閱權限已恢復");
             } else {
@@ -117,24 +116,6 @@ public class AppealController {
                 return MyResult.getResultMap(0, "申訴已拒絕");
             } else {
                 return MyResult.getResultMap(1, "申訴處理失敗");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return MyResult.getResultMap(2, "系統錯誤: " + e.getMessage());
-        }
-    }
-    
-    /**
-     * 獲取用戶當前的停權記錄（用於提交申訴時選擇）
-     */
-    @RequestMapping(value = {"/getUserActiveSuspensions", "/reader/getUserActiveSuspensions"})
-    public Map<String, Object> getUserActiveSuspensions(@RequestParam Integer userId) {
-        try {
-            SuspensionRecord record = suspensionService.getUserActiveSuspension(userId);
-            if (record != null) {
-                return MyResult.getResultMap(0, "success", record);
-            } else {
-                return MyResult.getResultMap(1, "未找到當前有效的停權記錄");
             }
         } catch (Exception e) {
             e.printStackTrace();

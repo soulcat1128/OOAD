@@ -100,6 +100,7 @@
         FROM suspension_record
         WHERE userId = #{userId, jdbcType=INTEGER}
         AND borrowId = #{borrowId, jdbcType=INTEGER}
+        AND borrowingPermission = 0
     </select>
     <update id="removeSuspensionByUserId" parameterType="com.bookmanager.bms.model.SuspensionRecord">
         UPDATE suspension_record
