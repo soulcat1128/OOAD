@@ -179,6 +179,6 @@
     FROM borrow
     WHERE userId = #{userid}
       AND bookId = #{bookid}
-#       AND returnTime IS NULL
+      AND returnTime IS NULL
   </select>
 </mapper>
