@@ -69,6 +69,8 @@ public class SuspensionRecord {
         this.borrowingPermission = borrowingPermission;
     }
 
+    public Byte getBorrowingPermission() {return  borrowingPermission;}
+
     /**
      * 恢復使用者的借閱權限
      */

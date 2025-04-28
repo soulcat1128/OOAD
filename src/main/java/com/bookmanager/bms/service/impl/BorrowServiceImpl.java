@@ -36,11 +36,6 @@ public class BorrowServiceImpl implements BorrowService {
         return borrowMapper.selectByPrimaryKey(borrowId);
     }
 
-//    @Override
-//    public List<Borrow> listByUser(Integer userId) {
-//        return borrowMapper.selectByUserId(userId);
-//    }
-
     @Override
     public Integer getCount() {
         return borrowMapper.selectCount();
