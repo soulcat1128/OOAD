@@ -50,11 +50,15 @@ public class ReservationRecordServiceTest {
     private ReservationRecord confirmedReservation;
     private List<ReservationRecord> reservationList;
     private List<ReservationRecord> userReservations;
+    private ReservationRecord repeatReservation;
+    private BookInfo repeatBook;
     private final Integer validUserId = 1;
     private final Integer suspendedUserId = 2;
     private final Integer availableBookId = 101;
     private final Integer borrowedBookId = 102;
     private final Integer validReservationId = 201;
+    private final Integer repeatReservationId = 202;
+    private final Integer repeatReservationBookId = 203;
 
     @BeforeEach
     void setUp() {
@@ -63,35 +67,48 @@ public class ReservationRecordServiceTest {
         availableBook.setBookid(availableBookId);
         availableBook.setBookname("可用的書籍");
         availableBook.setIsborrowed((byte) 0); // 未借出
-        
+
         // 設置已借出的書籍
         borrowedBook = new BookInfo();
         borrowedBook.setBookid(borrowedBookId);
         borrowedBook.setBookname("已借出的書籍");
         borrowedBook.setIsborrowed((byte) 1); // 已借出
-        
+
+        // 設置重複預約的書籍
+        repeatBook = new BookInfo();
+        repeatBook.setBookid(repeatReservationBookId);
+        repeatBook.setBookname("重複預約的書籍");
+        repeatBook.setIsborrowed((byte) 1); // 已借出
+
         // 設置有效的預約記錄
         activeReservation = new ReservationRecord();
         activeReservation.setReservationid(validReservationId);
         activeReservation.setUserid(validUserId);
         activeReservation.setBookid(borrowedBookId);
         activeReservation.setStatus((byte) 0); // 預約中
-        
+
         // 設置已確認的預約記錄
         confirmedReservation = new ReservationRecord();
         confirmedReservation.setReservationid(202);
         confirmedReservation.setUserid(validUserId);
         confirmedReservation.setBookid(borrowedBookId);
         confirmedReservation.setStatus((byte) 1); // 已確認
-        
+
         // 設置預約列表
         reservationList = new ArrayList<>();
         reservationList.add(activeReservation);
-        
+
         // 設置用戶的預約列表
         userReservations = new ArrayList<>();
         userReservations.add(activeReservation);
         userReservations.add(confirmedReservation);
+
+        repeatReservation = new ReservationRecord();
+        repeatReservation.setReservationid(repeatReservationId);
+        repeatReservation.setUserid(validUserId);
+        repeatReservation.setBookid(repeatReservationBookId);
+        repeatReservation.setStatus((byte) 0); // 預約中
+
     }
 
     @Test
@@ -161,6 +178,23 @@ public class ReservationRecordServiceTest {
         
         assertEquals(1, result.get("status"));
         assertTrue(result.get("message").toString().contains("已經借閱過了，無法再次預約"));
+        verify(reservationRecordMapper, never()).insert(any(ReservationRecord.class));
+    }
+
+    @Test
+    @DisplayName("測試添加預約記錄-用戶已預約過該書")
+    void testAddReservationRecordAlreadyReserve() {
+        when(bookInfoService.queryBookInfoById(repeatReservationBookId)).thenReturn(repeatBook);
+        when(suspensionService.getUserActiveSuspension(validUserId)).thenReturn(null);
+
+        List<ReservationRecord> alreadyReservedList = new ArrayList<>();
+        alreadyReservedList.add(repeatReservation);
+        when(reservationRecordMapper.selectByBookIdAndUserId(repeatReservationBookId, validUserId)).thenReturn(alreadyReservedList);
+
+        Map<String, Object> result = reservationRecordService.addReservationRecord(validUserId, repeatReservationBookId);
+
+        assertEquals(1, result.get("status"));
+        assertTrue(result.get("message").toString().contains("已經預約過了，無法再次預約"));
         verify(reservationRecordMapper, never()).insert(any(ReservationRecord.class));
     }
     
